@@ -1,0 +1,15 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Start Baby Website",
+			"type": "shell",
+			"command": "npm run dev",
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "test",
+			"isBackground": true
+		}
+	]
+}
