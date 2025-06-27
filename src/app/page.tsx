@@ -717,10 +717,10 @@ export default function Home() {
               <source src="/video/eco.mp4" type="video/mp4" />
               Seu navegador não suporta o elemento de vídeo.
             </video>
-            
+
             {/* Overlay com brilho sutil */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent rounded-xl pointer-events-none" />
-            
+
             {/* Efeito de brilho ao passar o mouse */}
             <motion.div
               className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-xl"
