@@ -87,6 +87,12 @@ export default function Home() {
   // Estado para controlar os corações flutuantes
   const [floatingHearts, setFloatingHearts] = useState<Array<{ id: number, x: number, y: number, emoji: string }>>([]);
 
+  // Estados para o efeito de raspadinha na ecografia
+  const [scratchProgress, setScratchProgress] = useState(0);
+  const [isScratching, setIsScratching] = useState(false);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
   // Função para criar corações flutuantes
   const createFloatingHearts = (clickX: number, clickY: number) => {
     const heartEmojis = babyGender === 'girl'
@@ -107,6 +113,179 @@ export default function Home() {
       setFloatingHearts(prev => prev.filter(heart => !newHearts.find(newHeart => newHeart.id === heart.id)));
     }, 4000);
   };
+
+  // Funções para o efeito de raspadinha
+  const initializeScratchCanvas = () => {
+    const canvas = canvasRef.current;
+    const container = containerRef.current;
+    if (!canvas || !container) return;
+
+    const rect = container.getBoundingClientRect();
+    canvas.width = rect.width;
+    canvas.height = rect.height;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Preenche o canvas com uma camada prateada/cinza que simula a raspadinha
+    const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+    gradient.addColorStop(0, '#c0c0c0');
+    gradient.addColorStop(0.5, '#e6e6e6');
+    gradient.addColorStop(1, '#a8a8a8');
+
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Adiciona um padrão de textura
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+    for (let i = 0; i < 20; i++) {
+      ctx.fillRect(Math.random() * canvas.width, Math.random() * canvas.height, 2, 2);
+    }
+
+    // Adiciona texto de instrução mais visível com melhor contraste
+    const fontSize = Math.max(18, canvas.width * 0.05);
+    const smallFontSize = Math.max(14, canvas.width * 0.04);
+
+    // Sombra do texto para melhor legibilidade
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+    ctx.font = `bold ${fontSize}px Arial`;
+    ctx.textAlign = 'center';
+    ctx.fillText('👆 Raspe aqui para revelar', canvas.width / 2 + 2, canvas.height / 2 - 6);
+
+    // Texto principal em branco
+    ctx.fillStyle = 'rgba(255, 255, 255, 1)';
+    ctx.font = `bold ${fontSize}px Arial`;
+
+
+    // Sombra do subtexto
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+    ctx.font = `${smallFontSize}px Arial`;
+    ctx.fillText('Minha primeira foto!', canvas.width / 2 + 1, canvas.height / 2 + 17);
+
+    // Subtexto em branco
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+    ctx.font = `${smallFontSize}px Arial`;
+
+  };
+
+  const scratch = (x: number, y: number) => {
+    const canvas = canvasRef.current;
+    const container = containerRef.current;
+    if (!canvas || !container) return;
+
+    const rect = container.getBoundingClientRect();
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Converte coordenadas da tela para coordenadas do canvas
+    const canvasX = ((x - rect.left) / rect.width) * canvas.width;
+    const canvasY = ((y - rect.top) / rect.height) * canvas.height;
+
+    // Configuração do "arranhão" - área maior e mais suave
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.beginPath();
+
+    // Área de raspagem maior para facilitar alcançar 100%
+    const brushSize = Math.min(canvas.width, canvas.height) * 0.12; // 12% do menor lado
+    ctx.arc(canvasX, canvasY, brushSize, 0, 2 * Math.PI);
+    ctx.fill();
+
+    // Adiciona efeito de borda suave para transição mais natural
+    ctx.beginPath();
+    ctx.arc(canvasX, canvasY, brushSize * 0.7, 0, 2 * Math.PI);
+    ctx.fill();
+
+    // Adiciona pontos extras ao redor para facilitar a raspagem
+    for (let i = 0; i < 4; i++) {
+      const angle = (i * Math.PI) / 2;
+      const offsetX = Math.cos(angle) * brushSize * 0.3;
+      const offsetY = Math.sin(angle) * brushSize * 0.3;
+
+      ctx.beginPath();
+      ctx.arc(canvasX + offsetX, canvasY + offsetY, brushSize * 0.4, 0, 2 * Math.PI);
+      ctx.fill();
+    }
+
+    // Calcula o progresso de forma mais precisa
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const pixels = imageData.data;
+    let transparentPixels = 0;
+    const totalPixels = canvas.width * canvas.height;
+
+    // Conta apenas pixels totalmente transparentes
+    for (let i = 3; i < pixels.length; i += 4) {
+      if (pixels[i] === 0) {
+        transparentPixels++;
+      }
+    }
+
+    const progress = Math.min(100, (transparentPixels / totalPixels) * 100);
+    setScratchProgress(progress);
+
+    // Remove a camada quando 80% for raspado (mais realista para 100%)
+    if (progress > 80) {
+      // Animação suave de remoção
+      canvas.style.transition = 'opacity 0.5s ease-out';
+      canvas.style.opacity = '0';
+
+      // Define progresso como 100% quando remove completamente
+      setTimeout(() => {
+        canvas.style.display = 'none';
+        setScratchProgress(100);
+      }, 500);
+    }
+  };
+
+  const handleStart = (e: React.MouseEvent | React.TouchEvent) => {
+    e.preventDefault();
+    setIsScratching(true);
+
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+
+    scratch(clientX, clientY);
+  };
+
+  const handleMove = (e: React.MouseEvent | React.TouchEvent) => {
+    if (!isScratching) return;
+    e.preventDefault();
+
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+
+    // Adiciona múltiplos pontos de raspagem para movimento mais suave
+    scratch(clientX, clientY);
+
+    // Adiciona pontos intermediários para movimentos rápidos
+    if ('touches' in e && e.touches[0]) {
+      setTimeout(() => {
+        scratch(clientX + 5, clientY + 5);
+        scratch(clientX - 5, clientY - 5);
+      }, 10);
+    }
+  };
+
+  const handleEnd = () => {
+    setIsScratching(false);
+  };
+
+  // Inicializa o canvas quando o componente é montado
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      initializeScratchCanvas();
+    }, 100);
+
+    const handleResize = () => {
+      setTimeout(initializeScratchCanvas, 100);
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   // Função para calcular o tempo restante até o nascimento
   useEffect(() => {
@@ -411,38 +590,228 @@ export default function Home() {
             </div>
           </div>
         </motion.div>
-      </section>
-
-      {/* Segunda seção - Ecografia */}
+      </section>        {/* Segunda seção - Ecografia com efeito de raspadinha */}
       <section className="h-screen w-full flex flex-col items-center justify-center snap-start bg-gradient-to-b from-blue-100 to-blue-200 dark:from-blue-900 dark:to-purple-900 p-8">
         <motion.h2
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           transition={{ duration: 1 }}
-          className="text-4xl font-bold mb-8 text-blue-600 dark:text-blue-300"
+          className="text-4xl font-bold mb-4 text-blue-600 dark:text-blue-300 text-center"
         >
-          Nossa primeira foto
+          Minha primeira foto
         </motion.h2>
+
+        <motion.p
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 1, delay: 0.3 }}
+          className="text-center text-blue-700 dark:text-blue-200 mb-8 px-4"
+        >
+          Raspe a tela para revelar minha primeira pose na barriga da mamãe! 💕
+        </motion.p>
+
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="relative w-full max-w-md aspect-square rounded-xl overflow-hidden shadow-xl"
+          className="relative w-full max-w-sm mx-auto"
         >
-          <Image
-            src="/images/ecografia1.jpg"
-            alt="Ecografia do bebê"
-            fill
-            style={{ objectFit: 'cover' }}
-            priority
-          />
+          <div
+            ref={containerRef}
+            className={`scratch-container relative aspect-square rounded-2xl overflow-hidden shadow-2xl bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-800 dark:to-blue-900 border-4 border-white/50 dark:border-blue-300/20 ${isScratching ? 'scratching' : ''}`}
+            style={{ touchAction: 'none' }}
+          >
+            <div className="absolute inset-0 z-10">
+              <Image
+                src="/images/ecografia1.jpg"
+                alt="Ecografia do bebê"
+                fill
+                style={{ objectFit: 'cover' }}
+                priority
+                className="rounded-xl"
+              />
+            </div>
+
+            <div className="absolute inset-0 z-20 bg-gradient-to-t from-black/10 to-transparent rounded-xl" />
+
+            <canvas
+              ref={canvasRef}
+              className="scratch-canvas absolute inset-0 z-30 rounded-xl transition-opacity duration-300"
+              onMouseDown={handleStart}
+              onMouseMove={handleMove}
+              onMouseUp={handleEnd}
+              onMouseLeave={handleEnd}
+              onTouchStart={handleStart}
+              onTouchMove={handleMove}
+              onTouchEnd={handleEnd}
+              style={{ touchAction: 'none' }}
+            />
+
+            {scratchProgress > 80 && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="absolute inset-0 z-50 pointer-events-none"
+              >
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                  animate={{
+                    x: ['-100%', '100%']
+                  }}
+                  transition={{
+                    duration: 1.5,
+                    ease: "easeInOut"
+                  }}
+                />
+              </motion.div>
+            )}
+          </div>
         </motion.div>
-        <p className="mt-6 text-center text-blue-700 dark:text-blue-200">
-          Nossa primeira visualização do bebê durante o ultrassom
-        </p>
+
+        {scratchProgress >= 100 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            className="mt-6 px-6 py-3 bg-white/20 dark:bg-blue-800/30 backdrop-blur-sm rounded-full border border-white/40 dark:border-blue-300/20"
+          >
+            <p className="text-center text-blue-700 dark:text-blue-200 font-medium">
+              Tcharam! Essa é a minha primeira fotinho direto do forninho! 💙
+            </p>
+          </motion.div>
+        )}
       </section>
 
-      {/* Terceira seção - Batimento cardíaco */}
+      {/* Nova seção - Vídeo da ecografia */}
+      <section className="h-screen w-full flex flex-col items-center justify-center snap-start bg-gradient-to-b from-indigo-100 to-indigo-200 dark:from-indigo-900 dark:to-blue-900 p-8">
+        <motion.h2
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 1 }}
+          className="text-4xl font-bold mb-4 text-indigo-600 dark:text-indigo-300 text-center"
+        >
+          Veja como me mexo!
+        </motion.h2>
+
+        <motion.p
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 1, delay: 0.3 }}
+          className="text-center text-indigo-700 dark:text-indigo-200 mb-8 px-4"
+        >
+          Aqui você pode me ver mexendo dentro da barriga da mamãe! 👶
+        </motion.p>
+
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="relative w-full max-w-lg mx-auto"
+        >
+          <div className="relative aspect-video rounded-2xl overflow-hidden shadow-2xl bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-indigo-800 dark:to-indigo-900 border-4 border-white/50 dark:border-indigo-300/20">
+            <video
+              className="w-full h-full object-cover rounded-xl"
+              controls
+              preload="metadata"
+              poster="/images/ecografia1.jpg"
+            >
+              <source src="/video/eco.mp4" type="video/mp4" />
+              Seu navegador não suporta o elemento de vídeo.
+            </video>
+            
+            {/* Overlay com brilho sutil */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent rounded-xl pointer-events-none" />
+            
+            {/* Efeito de brilho ao passar o mouse */}
+            <motion.div
+              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-xl"
+              whileHover={{
+                x: ['-100%', '100%']
+              }}
+              transition={{
+                duration: 1.5,
+                ease: "easeInOut"
+              }}
+            />
+          </div>
+
+          {/* Decoração ao redor do vídeo */}
+          <motion.div
+            className="absolute -top-4 -left-4 text-2xl"
+            animate={{
+              rotate: [0, 5, 0, -5, 0],
+              scale: [1, 1.1, 1]
+            }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          >
+            🎬
+          </motion.div>
+
+          <motion.div
+            className="absolute -top-4 -right-4 text-2xl"
+            animate={{
+              rotate: [0, -5, 0, 5, 0],
+              scale: [1, 1.1, 1]
+            }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 1.5
+            }}
+          >
+            ✨
+          </motion.div>
+
+          <motion.div
+            className="absolute -bottom-4 -left-4 text-2xl"
+            animate={{
+              y: [0, -5, 0],
+              scale: [1, 1.1, 1]
+            }}
+            transition={{
+              duration: 2.5,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 0.5
+            }}
+          >
+            🎥
+          </motion.div>
+
+          <motion.div
+            className="absolute -bottom-4 -right-4 text-2xl"
+            animate={{
+              rotate: [0, 10, 0, -10, 0],
+              scale: [1, 1.2, 1]
+            }}
+            transition={{
+              duration: 4,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 2
+            }}
+          >
+            💫
+          </motion.div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1, duration: 0.8 }}
+          className="mt-8 px-6 py-3 bg-white/20 dark:bg-indigo-800/30 backdrop-blur-sm rounded-full border border-white/40 dark:border-indigo-300/20"
+        >
+          <p className="text-center text-indigo-700 dark:text-indigo-200 font-medium text-sm">
+            🎭 Minha primeira performance ao vivo! Estou ensaiando para quando chegar! 🎪
+          </p>
+        </motion.div>
+      </section>
+
+      {/* Quarta seção - Batimento cardíaco */}
       <section className="h-screen w-full flex flex-col items-center justify-center snap-start bg-gradient-to-b from-purple-100 to-purple-200 dark:from-purple-900 dark:to-indigo-900 p-8 relative overflow-hidden">
         <motion.h2
           initial={{ opacity: 0 }}
@@ -568,7 +937,7 @@ export default function Home() {
         </motion.div>
       </section>
 
-      {/* Quarta seção - Contagem regressiva */}
+      {/* Quinta seção - Contagem regressiva */}
       <section className="h-screen w-full flex flex-col items-center justify-center snap-start bg-gradient-to-b from-green-100 to-green-200 dark:from-green-900 dark:to-teal-900 p-8">
         <motion.h2
           initial={{ opacity: 0 }}
