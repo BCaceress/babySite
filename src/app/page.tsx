@@ -1,15 +1,68 @@
 "use client";
 
+/*
+  ================================================
+  🍼 BABY WEBSITE - CONFIGURAÇÃO FÁCIL 🍼
+  ================================================
+  
+  Para trocar entre LÍVIA e NOAH, altere apenas estas 3 linhas:
+  
+  Linha ~12: babyName = "Lívia" ou "Noah"
+  Linha ~13: babyGender = "girl" ou "boy"  
+  Linha ~14: dueDate = new Date("January 14, 2026")
+  
+  🎨 TEMAS AUTOMÁTICOS:
+  - "girl" = Rosa/Pink (tons femininos)
+  - "boy" = Azul/Blue (tons masculinos)
+  
+  ✨ O design se adapta automaticamente!
+  ================================================
+*/
+
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 export default function Home() {
-  // Nome do bebê (você pode alterar conforme necessário)
-  const babyName = "Lívia";
+  // ====== CONFIGURAÇÕES DO BEBÊ - ALTERE AQUI ======
+  const babyName = "Noah"; // Altere para "Lívia" ou "Noah"
+  const babyGender = "boy" as "girl" | "boy"; // "girl" para menina ou "boy" para menino
+  const dueDate = useMemo(() => new Date("January 14, 2026"), []); // Data estimada de nascimento
 
-  // Data estimada de nascimento (altere para a data correta) - moved outside to prevent recreation
-  const dueDate = useMemo(() => new Date("January 14, 2026"), []);
+  // Configurações de tema baseadas no gênero
+  const themeConfig = useMemo(() => {
+    if (babyGender === "girl") {
+      return {
+        colors: {
+          primary: "pink-600",
+          primaryDark: "pink-300",
+          secondary: "pink-700",
+          secondaryDark: "pink-200",
+          gradient: "from-pink-100 to-pink-200",
+          gradientDark: "from-pink-500 to-pink-300",
+          accent: "pink-800",
+          accentDark: "pink-100"
+        },
+        message: "Uma princesinha está a caminho! 👑",
+        emoji: "🩷"
+      };
+    } else {
+      return {
+        colors: {
+          primary: "blue-600",
+          primaryDark: "blue-300",
+          secondary: "blue-700",
+          secondaryDark: "blue-200",
+          gradient: "from-blue-100 to-blue-200",
+          gradientDark: "from-blue-900 to-indigo-900",
+          accent: "blue-800",
+          accentDark: "blue-100"
+        },
+        message: "Um pequeno príncipe está a caminho! 🤴",
+        emoji: "💙"
+      };
+    }
+  }, [babyGender]);
 
   // Estado para armazenar o tempo restante
   const [timeLeft, setTimeLeft] = useState({
@@ -30,6 +83,30 @@ export default function Home() {
 
   // Estado para controlar quantas vezes o áudio tocou
   const [playCount, setPlayCount] = useState(0);
+
+  // Estado para controlar os corações flutuantes
+  const [floatingHearts, setFloatingHearts] = useState<Array<{ id: number, x: number, y: number, emoji: string }>>([]);
+
+  // Função para criar corações flutuantes
+  const createFloatingHearts = (clickX: number, clickY: number) => {
+    const heartEmojis = babyGender === 'girl'
+      ? ['💕', '💖', '🩰', '🧸', '👧🏼', '💘', '🌸', '🎀', '🥰']
+      : ['💙', '🍼', '🤍', '⚽', '🦖', '⭐', '🤴', '👶', '🚗'];
+
+    const newHearts = Array.from({ length: 6 }, (_, i) => ({
+      id: Date.now() + i + Math.random() * 1000,
+      x: clickX + (Math.random() - 0.5) * 450, // Maior espalhamento
+      y: clickY + (Math.random() - 0.5) * 100, // Pequena variação vertical
+      emoji: heartEmojis[Math.floor(Math.random() * heartEmojis.length)]
+    }));
+
+    setFloatingHearts(prev => [...prev, ...newHearts]);
+
+    // Remove os corações após a animação
+    setTimeout(() => {
+      setFloatingHearts(prev => prev.filter(heart => !newHearts.find(newHeart => newHeart.id === heart.id)));
+    }, 4000);
+  };
 
   // Função para calcular o tempo restante até o nascimento
   useEffect(() => {
@@ -169,31 +246,170 @@ export default function Home() {
   return (
     <div className="font-[family-name:var(--font-geist-sans)] overflow-y-auto snap-y snap-mandatory h-screen">
       {/* Primeira seção - Nome do bebê */}
-      <section className="h-screen w-full flex flex-col items-center justify-center snap-start bg-gradient-to-b from-pink-100 to-pink-200 dark:from-pink-900 dark:to-purple-900 p-8">
-        <motion.h1
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1 }}
-          className="text-6xl font-bold text-center text-pink-600 dark:text-pink-300"
-        >
-          {babyName}
-        </motion.h1>
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5, duration: 1 }}
-          className="text-xl mt-4 text-center text-pink-700 dark:text-pink-200"
-        >
-          Uma vida incrível está a caminho!
-        </motion.p>
+      <section className={`h-screen w-full flex flex-col items-center justify-center snap-start bg-gradient-to-b ${themeConfig.colors.gradient} dark:${themeConfig.colors.gradientDark} p-8 relative`}>
+        <div className="flex-1 flex flex-col items-center justify-center">
+          <motion.h1
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1 }}
+            className={`text-6xl font-bold text-center text-${themeConfig.colors.primary} dark:text-${themeConfig.colors.primaryDark}`}
+          >
+            {babyName}
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5, duration: 1 }}
+            className={`text-xl mt-4 text-center text-${themeConfig.colors.secondary} dark:text-${themeConfig.colors.secondaryDark}`}
+          >
+            {themeConfig.message}
+          </motion.p>
+
+          {/* Badge com emoji temático - Interativo */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 1, duration: 0.8 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="mt-6 px-6 py-3 bg-white/20 dark:bg-gray-800/30 backdrop-blur-sm rounded-full border border-white/40 dark:border-gray-300/20 cursor-pointer hover:bg-white/30 dark:hover:bg-gray-800/40 transition-all duration-300 group"
+            onClick={(e) => {
+              // Pega as coordenadas do clique
+              const clickX = e.clientX;
+              const clickY = e.clientY;
+
+              // Cria corações flutuantes
+              createFloatingHearts(clickX, clickY);
+
+              // Efeito de bounce no clique
+              const element = document.querySelector('.heart-emoji') as HTMLElement;
+              if (element) {
+                element.classList.add('heart-bounce');
+                setTimeout(() => {
+                  element.classList.remove('heart-bounce');
+                }, 600);
+              }
+
+              // Adiciona efeito de ripple
+              const ripple = document.createElement('div');
+              ripple.className = 'absolute inset-0 rounded-full bg-white/30 animate-ping';
+              const parent = element?.parentElement;
+              if (parent) {
+                parent.appendChild(ripple);
+                setTimeout(() => {
+                  ripple.remove();
+                }, 600);
+              }
+            }}
+          >
+            <motion.span
+              className="text-2xl heart-emoji inline-block relative"
+              whileHover={{
+                rotate: [0, -5, 5, 0],
+                scale: [1, 1.1, 1]
+              }}
+              transition={{ duration: 0.4 }}
+              animate={{
+                y: [0, -2, 0]
+              }}
+              style={{
+                animationDuration: '3s',
+                animationIterationCount: 'infinite',
+                animationTimingFunction: 'ease-in-out'
+              }}
+            >
+              {themeConfig.emoji}
+            </motion.span>
+          </motion.div>
+        </div>
+
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.7 }}
-          transition={{ delay: 1, duration: 1 }}
-          className="absolute bottom-8 text-center"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{
+            delay: 2,
+            duration: 1.2,
+            ease: [0.25, 0.46, 0.45, 0.94]
+          }}
+          className="mb-6 text-center w-full"
         >
-          <p className="text-sm text-pink-600 dark:text-pink-300">Deslize para cima para conhecer nosso bebê</p>
-          <div className="animate-bounce mt-2">⬆️</div>
+          <div className="flex flex-col items-center space-y-4">
+            <motion.div
+              className="group cursor-pointer"
+              whileHover={{ y: -2, scale: 1.02 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+            >
+              <div className={`flex items-center space-x-3 px-8 py-4 bg-white/25 dark:bg-gray-800/40 backdrop-blur-md rounded-full border border-white/30 dark:border-${themeConfig.colors.primary}-300/25 shadow-xl hover:shadow-${themeConfig.colors.primary}-200/30 dark:hover:shadow-${themeConfig.colors.primary}-400/20 transition-all duration-500`}>
+                <span className={`text-[10px] font-medium text-${themeConfig.colors.accent} dark:text-${themeConfig.colors.accentDark} tracking-wide`}>
+                  Arraste para cima para conhecer nosso bebê
+                </span>
+                <motion.div
+                  className={`w-6 h-6 rounded-full bg-gradient-to-br from-${themeConfig.colors.primary}-400/30 to-${themeConfig.colors.primary}-600/30 dark:from-${themeConfig.colors.primary}-300/30 dark:to-${themeConfig.colors.primary}-500/30 flex items-center justify-center`}
+                  animate={{
+                    scale: [1, 1.1, 1],
+                    rotate: [0, 5, 0, -5, 0]
+                  }}
+                  transition={{
+                    duration: 3,
+                    repeat: Infinity,
+                    repeatType: "reverse",
+                    ease: "easeInOut"
+                  }}
+                >
+                  <motion.svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className={`text-${themeConfig.colors.secondary} dark:text-${themeConfig.colors.secondaryDark}`}
+                    animate={{
+                      y: [-1, 1, -1]
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      ease: "easeInOut"
+                    }}
+                  >
+                    <path d="m18 15-6-6-6 6" />
+                  </motion.svg>
+                </motion.div>
+              </div>
+            </motion.div>
+
+            {/* Indicador visual melhorado */}
+            <div className="flex flex-col items-center space-y-2">
+              <motion.div
+                className={`w-0.5 h-6 bg-gradient-to-b from-${themeConfig.colors.primary}-400/80 to-transparent rounded-full`}
+                animate={{
+                  opacity: [0.3, 0.8, 0.3],
+                  scaleY: [0.8, 1, 0.8]
+                }}
+                transition={{
+                  duration: 2.5,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+              />
+              <motion.div
+                className={`w-1.5 h-1.5 rounded-full bg-${themeConfig.colors.primary}-400/60`}
+                animate={{
+                  scale: [0.8, 1.2, 0.8],
+                  opacity: [0.6, 1, 0.6]
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: 0.5
+                }}
+              />
+            </div>
+          </div>
         </motion.div>
       </section>
 
@@ -346,6 +562,24 @@ export default function Home() {
           Previsão de nascimento: {dueDate.toLocaleDateString('pt-BR')}
         </p>
       </section>
+
+      {/* Corações flutuantes */}
+      {floatingHearts.length > 0 && (
+        <div className="floating-hearts">
+          {floatingHearts.map((heart) => (
+            <div
+              key={heart.id}
+              className="floating-heart-particle"
+              style={{
+                left: heart.x - 10, // Centraliza o emoji
+                top: heart.y - 10, // Posição inicial do clique
+              }}
+            >
+              {heart.emoji}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

@@ -45,3 +45,167 @@ body {
 .snap-start {
   scroll-snap-align: start;
 }
+
+/* Efeitos para o coração */
+.heart-emoji {
+  transition: all 0.3s ease;
+}
+
+.heart-bounce {
+  animation: heartBounce 0.6s ease-in-out;
+}
+
+@keyframes heartBounce {
+  0% {
+    transform: scale(1);
+  }
+
+  25% {
+    transform: scale(1.3) rotate(-5deg);
+  }
+
+  50% {
+    transform: scale(1.1) rotate(5deg);
+  }
+
+  75% {
+    transform: scale(1.2) rotate(-3deg);
+  }
+
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+/* Efeito de pulso suave */
+.heart-pulse-gentle {
+  animation: heartPulseGentle 2s ease-in-out infinite;
+}
+
+@keyframes heartPulseGentle {
+
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
+}
+
+/* Floating hearts no fundo */
+.floating-heart {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+
+  33% {
+    transform: translateY(-10px) rotate(2deg);
+  }
+
+  66% {
+    transform: translateY(5px) rotate(-1deg);
+  }
+}
+
+/* Efeitos para o botão do coração na seção de batimento */
+.heart-glow {
+  box-shadow: 0 0 30px rgba(236, 72, 153, 0.3);
+}
+
+.heart-gentle {
+  animation: heartGentle 3s ease-in-out infinite;
+}
+
+.heart-pulse {
+  animation: heartPulse 0.8s ease-in-out infinite;
+}
+
+@keyframes heartGentle {
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.02);
+  }
+}
+
+@keyframes heartPulse {
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+/* Corações flutuantes animados */
+.floating-hearts {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+.floating-heart-particle {
+  position: absolute;
+  font-size: 20px;
+  animation: floatUp 3s ease-out forwards;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+.floating-heart-particle:nth-child(odd) {
+  animation-duration: 2.5s;
+  font-size: 24px;
+}
+
+.floating-heart-particle:nth-child(even) {
+  animation-duration: 3.5s;
+  font-size: 16px;
+}
+
+@keyframes floatUp {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(0.3) rotate(0deg);
+  }
+
+  20% {
+    opacity: 1;
+    transform: translateY(-20vh) scale(1) rotate(15deg);
+  }
+
+  50% {
+    opacity: 0.9;
+    transform: translateY(-50vh) scale(0.8) rotate(-10deg);
+  }
+
+  80% {
+    opacity: 0.5;
+    transform: translateY(-80vh) scale(0.5) rotate(25deg);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(-110vh) scale(0.2) rotate(45deg);
+  }
+}
