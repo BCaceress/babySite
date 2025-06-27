@@ -479,23 +479,66 @@ export default function Home() {
           className="flex flex-col items-center relative z-10"
         >
           {/* Botão principal com coração pulsante */}
-          <div className="heart-waves">
-            <button
+          <div className={`heart-waves ${isPlaying ? 'heart-waves-active' : ''}`}>
+            <motion.button
               onClick={toggleHeartbeat}
-              className={`w-48 h-48 rounded-full bg-gradient-to-br from-pink-400 to-pink-600 dark:from-pink-500 dark:to-pink-700 flex items-center justify-center shadow-2xl hover:shadow-pink-300/50 transition-all transform hover:scale-105 active:scale-95 heart-glow relative cursor-pointer ${isPlaying ? 'heart-pulse' : 'heart-gentle'}`}
+              className={`w-48 h-48 rounded-full bg-gradient-to-br from-pink-400 to-pink-600 dark:from-pink-500 dark:to-pink-700 flex items-center justify-center shadow-2xl hover:shadow-pink-300/50 transition-all transform hover:scale-105 active:scale-95 heart-glow relative cursor-pointer ${isPlaying ? 'heart-beating' : 'heart-gentle'}`}
               type="button"
+              animate={isPlaying ? {
+                boxShadow: [
+                  "0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 30px rgba(236, 72, 153, 0.3)",
+                  "0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 60px rgba(236, 72, 153, 0.7)",
+                  "0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 30px rgba(236, 72, 153, 0.3)"
+                ]
+              } : {}}
+              transition={isPlaying ? {
+                duration: 0.8,
+                repeat: Infinity,
+                ease: "easeInOut"
+              } : {}}
             >
               {/* Coração principal */}
-              <svg
+              <motion.svg
                 width="80"
                 height="80"
                 viewBox="0 0 24 24"
                 fill="white"
-                className={`relative z-10 ${isPlaying ? 'heart-pulse' : 'heart-gentle'}`}
+                className="relative z-10"
+                animate={isPlaying ? {
+                  scale: [1, 1.15, 1, 1.08, 1],
+                } : {
+                  scale: [1, 1.02, 1]
+                }}
+                transition={isPlaying ? {
+                  duration: 0.8,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  times: [0, 0.14, 0.28, 0.42, 1]
+                } : {
+                  duration: 3,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
               >
                 <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-              </svg>
-            </button>
+              </motion.svg>
+
+              {/* Efeito de brilho interno pulsante */}
+              {isPlaying && (
+                <motion.div
+                  className="absolute inset-4 rounded-full bg-gradient-to-br from-white/20 to-transparent"
+                  animate={{
+                    opacity: [0.2, 0.6, 0.2, 0.4, 0.2]
+                  }}
+                  transition={{
+                    duration: 0.8,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                    times: [0, 0.14, 0.28, 0.42, 1]
+                  }}
+                />
+              )}
+            </motion.button>
           </div>
 
           <motion.p

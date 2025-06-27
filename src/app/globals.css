@@ -154,6 +154,72 @@ body {
   }
 }
 
+/* Animação realista de batimento cardíaco */
+.heart-beating {
+  animation: realHeartbeat 0.8s ease-in-out infinite;
+}
+
+@keyframes realHeartbeat {
+  0% {
+    transform: scale(1);
+  }
+
+  14% {
+    transform: scale(1.1);
+  }
+
+  28% {
+    transform: scale(1);
+  }
+
+  42% {
+    transform: scale(1.05);
+  }
+
+  70% {
+    transform: scale(1);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Ondas pulsantes para o coração */
+.heart-waves-active {
+  position: relative;
+}
+
+.heart-waves-active::before,
+.heart-waves-active::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  border: 2px solid rgba(236, 72, 153, 0.3);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: heartWaves 0.8s ease-out infinite;
+}
+
+.heart-waves-active::after {
+  animation-delay: 0.4s;
+}
+
+@keyframes heartWaves {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: translate(-50%, -50%) scale(1.8);
+    opacity: 0;
+  }
+}
+
 /* Corações flutuantes animados */
 .floating-hearts {
   position: fixed;
