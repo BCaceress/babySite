@@ -29,81 +29,6 @@ export default function Home() {
   const babyGender = "boy" as "girl" | "boy" | "reveal"; // "girl" para menina, "boy" para menino ou "reveal" para chá revelação
   const dueDate = useMemo(() => new Date("January 14, 2026"), []); // Data estimada de nascimento
 
-  // Calcula o número de dias desde uma data de referência (dia 82 = 30 de junho de 2025)
-  const dayCounter = useMemo(() => {
-    const referenceDate = new Date("June 30, 2025"); // Data de referência quando era "dia 82"
-    const currentDate = new Date();
-    const timeDiff = currentDate.getTime() - referenceDate.getTime();
-    const dayDiff = Math.floor(timeDiff / (1000 * 3600 * 24));
-    return 82 + dayDiff; // Adiciona a diferença em dias ao valor inicial (82)
-  }, []);
-
-  // Configurações de tema baseadas no gênero
-  const themeConfig = useMemo(() => {
-    if (babyGender === "reveal") {
-      return {
-        colors: {
-          primary: "pink-500",
-          primaryDark: "pink-300",
-          secondary: "sky-600",
-          secondaryDark: "sky-300",
-          gradient: "from-pink-400 to-sky-400",
-          gradientDark: "from-pink-600 to-sky-600",
-          accent: "purple-500",
-          accentDark: "purple-200"
-        },
-        message: "Chá revelação! 💖💙",
-        emoji: "🎉"
-      };
-    }
-    if (babyGender === "girl") {
-      return {
-        colors: {
-          primary: "pink-600",
-          primaryDark: "pink-300",
-          secondary: "pink-700",
-          secondaryDark: "pink-200",
-          gradient: "from-pink-400 to-pink-600",
-          gradientDark: "from-pink-700 to-pink-500",
-          accent: "pink-800",
-          accentDark: "pink-100"
-        },
-        message: "Uma princesinha está a caminho! 👑",
-        emoji: "🩷"
-      };
-    } else if (babyGender === "boy") {
-      return {
-        colors: {
-          primary: "sky-600",
-          primaryDark: "sky-300",
-          secondary: "sky-700",
-          secondaryDark: "sky-200",
-          gradient: "from-sky-400 to-sky-600",
-          gradientDark: "from-sky-800 to-sky-700",
-          accent: "sky-800",
-          accentDark: "sky-100"
-        },
-        message: "Um pequeno príncipe está a caminho! 🤴",
-        emoji: "💙"
-      };
-    } else {
-      return {
-        colors: {
-          primary: "purple-600",
-          primaryDark: "purple-300",
-          secondary: "purple-700",
-          secondaryDark: "purple-200",
-          gradient: "from-purple-400 to-purple-600",
-          gradientDark: "from-purple-700 to-purple-500",
-          accent: "purple-800",
-          accentDark: "purple-100"
-        },
-        message: "Surpresa! O bebê é uma caixinha de mistério! 🎁",
-        emoji: "🟣"
-      };
-    }
-  }, [babyGender]);
-
   // Estado para armazenar o tempo restante
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
@@ -483,9 +408,18 @@ export default function Home() {
 
   // Estado para controlar se o componente já montou (para evitar hydration mismatch)
   const [mounted, setMounted] = useState(false);
-
   useEffect(() => {
     setMounted(true);
+  }, []);
+
+  // dayCounter agora é calculado apenas no client para evitar hydration mismatch
+  const [dayCounter, setDayCounter] = useState<number | null>(null);
+  useEffect(() => {
+    const referenceDate = new Date("June 30, 2025");
+    const currentDate = new Date();
+    const timeDiff = currentDate.getTime() - referenceDate.getTime();
+    const dayDiff = Math.floor(timeDiff / (1000 * 3600 * 24));
+    setDayCounter(82 + dayDiff);
   }, []);
 
   // Memoize formatted due date string (only on client after mount)
@@ -493,6 +427,72 @@ export default function Home() {
     if (!mounted) return '';
     return dueDate.toLocaleDateString('pt-BR');
   }, [dueDate, mounted]);
+
+  // Configurações de tema baseadas no gênero
+  const themeConfig = useMemo(() => {
+    if (babyGender === "reveal") {
+      return {
+        colors: {
+          primary: "pink-500",
+          primaryDark: "pink-300",
+          secondary: "sky-600",
+          secondaryDark: "sky-300",
+          gradient: "from-pink-400 to-sky-400",
+          gradientDark: "from-pink-600 to-sky-600",
+          accent: "purple-500",
+          accentDark: "purple-200"
+        },
+        message: "Chá revelação! 💖💙",
+        emoji: "🎉"
+      };
+    }
+    if (babyGender === "girl") {
+      return {
+        colors: {
+          primary: "pink-600",
+          primaryDark: "pink-300",
+          secondary: "pink-700",
+          secondaryDark: "pink-200",
+          gradient: "from-pink-400 to-pink-600",
+          gradientDark: "from-pink-700 to-pink-500",
+          accent: "pink-800",
+          accentDark: "pink-100"
+        },
+        message: "Uma princesinha está a caminho! 👑",
+        emoji: "🩷"
+      };
+    } else if (babyGender === "boy") {
+      return {
+        colors: {
+          primary: "sky-600",
+          primaryDark: "sky-300",
+          secondary: "sky-700",
+          secondaryDark: "sky-200",
+          gradient: "from-sky-400 to-sky-600",
+          gradientDark: "from-sky-800 to-sky-700",
+          accent: "sky-800",
+          accentDark: "sky-100"
+        },
+        message: "Um pequeno príncipe está a caminho! 🤴",
+        emoji: "💙"
+      };
+    } else {
+      return {
+        colors: {
+          primary: "purple-600",
+          primaryDark: "purple-300",
+          secondary: "purple-700",
+          secondaryDark: "purple-200",
+          gradient: "from-purple-400 to-purple-600",
+          gradientDark: "from-purple-700 to-purple-500",
+          accent: "purple-800",
+          accentDark: "purple-100"
+        },
+        message: "Surpresa! O bebê é uma caixinha de mistério! 🎁",
+        emoji: "🟣"
+      };
+    }
+  }, [babyGender]);
 
   return (
     <div className="font-[family-name:var(--font-geist-sans)] overflow-y-auto snap-y snap-mandatory h-screen">
@@ -543,7 +543,7 @@ export default function Home() {
                 👶🏻
               </motion.div>
               <p className="text-center text-white text-sm font-medium">
-                Estou completando <span className="font-extrabold">{dayCounter} dias</span> hoje!
+                Estou completando <span className="font-extrabold">{dayCounter !== null ? dayCounter : ''} dias</span> hoje!
               </p>
             </div>
           </motion.div>
