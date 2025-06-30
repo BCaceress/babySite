@@ -46,6 +46,23 @@ body {
   scroll-snap-align: start;
 }
 
+/* Gradientes para os nomes dos bebês */
+.name-gradient-noah {
+  background: linear-gradient(to right, #1e40af, #3b82f6);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.name-gradient-livia {
+  background: linear-gradient(to right, #be185d, #ec4899);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
 /* Efeitos para o coração */
 .heart-emoji {
   transition: all 0.3s ease;

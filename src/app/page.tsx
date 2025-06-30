@@ -29,6 +29,15 @@ export default function Home() {
   const babyGender = "boy" as "girl" | "boy"; // "girl" para menina ou "boy" para menino
   const dueDate = useMemo(() => new Date("January 14, 2026"), []); // Data estimada de nascimento
 
+  // Calcula o número de dias desde uma data de referência (dia 82 = 30 de junho de 2025)
+  const dayCounter = useMemo(() => {
+    const referenceDate = new Date("June 30, 2025"); // Data de referência quando era "dia 82"
+    const currentDate = new Date();
+    const timeDiff = currentDate.getTime() - referenceDate.getTime();
+    const dayDiff = Math.floor(timeDiff / (1000 * 3600 * 24));
+    return 82 + dayDiff; // Adiciona a diferença em dias ao valor inicial (82)
+  }, []);
+
   // Configurações de tema baseadas no gênero
   const themeConfig = useMemo(() => {
     if (babyGender === "girl") {
@@ -431,7 +440,7 @@ export default function Home() {
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1 }}
-            className={`text-6xl font-bold text-center text-${themeConfig.colors.primary} dark:text-${themeConfig.colors.primaryDark}`}
+            className={`text-6xl font-bold text-center ${babyName === "Noah" ? "name-gradient-noah" : "name-gradient-livia"}`}
           >
             {babyName}
           </motion.h1>
@@ -452,7 +461,7 @@ export default function Home() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="mt-6 px-6 py-3 bg-white/20 dark:bg-gray-800/30 backdrop-blur-sm rounded-full border border-white/40 dark:border-gray-300/20 cursor-pointer hover:bg-white/30 dark:hover:bg-gray-800/40 transition-all duration-300 group"
-            onClick={(e) => {
+            onClick={(e: React.MouseEvent) => {
               // Pega as coordenadas do clique
               const clickX = e.clientX;
               const clickY = e.clientY;
@@ -591,12 +600,12 @@ export default function Home() {
           </div>
         </motion.div>
       </section>        {/* Segunda seção - Ecografia com efeito de raspadinha */}
-      <section className="h-screen w-full flex flex-col items-center justify-center snap-start bg-gradient-to-b from-blue-100 to-blue-200 dark:from-blue-900 dark:to-purple-900 p-8">
+      <section className="h-screen w-full flex flex-col items-center justify-center snap-start bg-gradient-to-br from-purple-100 via-pink-50 to-purple-200 dark:from-purple-900 dark:via-purple-800 dark:to-indigo-900 p-8">
         <motion.h2
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           transition={{ duration: 1 }}
-          className="text-4xl font-bold mb-4 text-blue-600 dark:text-blue-300 text-center"
+          className="text-4xl font-bold mb-4 text-purple-600 dark:text-purple-300 text-center"
         >
           Minha primeira foto
         </motion.h2>
@@ -605,7 +614,7 @@ export default function Home() {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           transition={{ duration: 1, delay: 0.3 }}
-          className="text-center text-blue-700 dark:text-blue-200 mb-8 px-4"
+          className="text-center text-purple-700 dark:text-purple-200 mb-8 px-4"
         >
           Raspe a tela para revelar minha primeira pose na barriga da mamãe! 💕
         </motion.p>
@@ -618,7 +627,7 @@ export default function Home() {
         >
           <div
             ref={containerRef}
-            className={`scratch-container relative aspect-square rounded-2xl overflow-hidden shadow-2xl bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-800 dark:to-blue-900 border-4 border-white/50 dark:border-blue-300/20 ${isScratching ? 'scratching' : ''}`}
+            className={`scratch-container relative aspect-square rounded-2xl overflow-hidden shadow-2xl bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-700 dark:to-purple-900 border-4 border-white/50 dark:border-purple-300/20 ${isScratching ? 'scratching' : ''}`}
             style={{ touchAction: 'none' }}
           >
             <div className="absolute inset-0 z-10">
@@ -672,9 +681,9 @@ export default function Home() {
           <motion.div
             initial={{ opacity: 0, y: 20, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            className="mt-6 px-6 py-3 bg-white/20 dark:bg-blue-800/30 backdrop-blur-sm rounded-full border border-white/40 dark:border-blue-300/20"
+            className="mt-6 px-6 py-3 bg-white/20 dark:bg-purple-800/30 backdrop-blur-sm rounded-full border border-white/40 dark:border-purple-300/20"
           >
-            <p className="text-center text-blue-700 dark:text-blue-200 font-medium">
+            <p className="text-center text-purple-700 dark:text-purple-200 font-medium">
               Tcharam! Essa é a minha primeira fotinho direto do forninho! 💙
             </p>
           </motion.div>
@@ -682,12 +691,12 @@ export default function Home() {
       </section>
 
       {/* Nova seção - Vídeo da ecografia */}
-      <section className="h-screen w-full flex flex-col items-center justify-center snap-start bg-gradient-to-b from-indigo-100 to-indigo-200 dark:from-indigo-900 dark:to-blue-900 p-8">
+      <section className="h-screen w-full flex flex-col items-center justify-center snap-start bg-gradient-to-tl from-indigo-100 via-purple-100 to-pink-100 dark:from-indigo-900 dark:via-purple-900 dark:to-purple-800 p-8">
         <motion.h2
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           transition={{ duration: 1 }}
-          className="text-4xl font-bold mb-4 text-indigo-600 dark:text-indigo-300 text-center"
+          className="text-4xl font-bold mb-4 text-purple-600 dark:text-purple-300 text-center"
         >
           Veja como me mexo!
         </motion.h2>
@@ -696,7 +705,7 @@ export default function Home() {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           transition={{ duration: 1, delay: 0.3 }}
-          className="text-center text-indigo-700 dark:text-indigo-200 mb-8 px-4"
+          className="text-center text-purple-700 dark:text-purple-200 mb-8 px-4"
         >
           Aqui você pode me ver mexendo dentro da barriga da mamãe! 👶
         </motion.p>
@@ -707,7 +716,7 @@ export default function Home() {
           transition={{ duration: 0.8 }}
           className="relative w-full max-w-lg mx-auto"
         >
-          <div className="relative aspect-video rounded-2xl overflow-hidden shadow-2xl bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-indigo-800 dark:to-indigo-900 border-4 border-white/50 dark:border-indigo-300/20">
+          <div className="relative aspect-video rounded-2xl overflow-hidden shadow-2xl bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-800 dark:to-purple-900 border-4 border-white/50 dark:border-purple-300/20">
             <video
               className="w-full h-full object-cover rounded-xl"
               controls
@@ -803,16 +812,16 @@ export default function Home() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ delay: 1, duration: 0.8 }}
-          className="mt-8 px-6 py-3 bg-white/20 dark:bg-indigo-800/30 backdrop-blur-sm rounded-full border border-white/40 dark:border-indigo-300/20"
+          className="mt-8 px-6 py-3 bg-white/20 dark:bg-purple-800/30 backdrop-blur-sm rounded-full border border-white/40 dark:border-purple-300/20"
         >
-          <p className="text-center text-indigo-700 dark:text-indigo-200 font-medium text-sm">
+          <p className="text-center text-purple-700 dark:text-purple-200 font-medium text-sm">
             🎭 Minha primeira performance ao vivo! Estou ensaiando para quando chegar! 🎪
           </p>
         </motion.div>
       </section>
 
       {/* Quarta seção - Batimento cardíaco */}
-      <section className="h-screen w-full flex flex-col items-center justify-center snap-start bg-gradient-to-b from-purple-100 to-purple-200 dark:from-purple-900 dark:to-indigo-900 p-8 relative overflow-hidden">
+      <section className="h-screen w-full flex flex-col items-center justify-center snap-start bg-gradient-to-tr from-pink-100 via-purple-100 to-indigo-100 dark:from-pink-900 dark:via-purple-900 dark:to-indigo-900 p-8 relative overflow-hidden">
         <motion.h2
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
@@ -938,41 +947,184 @@ export default function Home() {
       </section>
 
       {/* Quinta seção - Contagem regressiva */}
-      <section className="h-screen w-full flex flex-col items-center justify-center snap-start bg-gradient-to-b from-green-100 to-green-200 dark:from-green-900 dark:to-teal-900 p-8">
+      <section className="h-screen w-full flex flex-col items-center justify-center snap-start bg-gradient-to-bl from-purple-200 via-indigo-100 to-purple-100 dark:from-purple-800 dark:via-indigo-900 dark:to-purple-900 p-8 relative overflow-hidden">
+        {/* Elementos decorativos flutuantes - Relógio e calendários */}
+        <div className="absolute top-16 right-20 floating-heart opacity-20">
+          {/* Relógio */}
+          <svg width="35" height="35" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-purple-400">
+            <circle cx="12" cy="12" r="10" />
+            <path d="M12 6v6l4 2" />
+          </svg>
+        </div>
+
+        <div className="absolute top-24 left-28 floating-heart opacity-15" style={{ animationDelay: '1.5s' }}>
+          {/* Calendário estilo 1 */}
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-indigo-300">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+            <line x1="16" y1="2" x2="16" y2="6" />
+            <line x1="8" y1="2" x2="8" y2="6" />
+            <line x1="3" y1="10" x2="21" y2="10" />
+            <path d="M8 14h.01" />
+            <path d="M12 14h.01" />
+            <path d="M16 14h.01" />
+            <path d="M8 18h.01" />
+            <path d="M12 18h.01" />
+            <path d="M16 18h.01" />
+          </svg>
+        </div>
+
+        <div className="absolute bottom-28 right-20 floating-heart opacity-10" style={{ animationDelay: '2.2s' }}>
+          {/* Calendário estilo 2 */}
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-purple-500">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+            <line x1="16" y1="2" x2="16" y2="6" />
+            <line x1="8" y1="2" x2="8" y2="6" />
+            <line x1="3" y1="10" x2="21" y2="10" />
+            <rect x="7" y="14" width="4" height="4" />
+          </svg>
+        </div>
+
         <motion.h2
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           transition={{ duration: 1 }}
-          className="text-4xl font-bold mb-8 text-green-600 dark:text-green-300"
+          className="text-4xl font-bold mb-8 text-purple-600 dark:text-purple-300"
         >
           Estou chegando em
         </motion.h2>
+
         <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 0.3 }}
-          className="grid grid-cols-2 sm:grid-cols-4 gap-4 w-full max-w-lg"
+          initial={{ opacity: 0, scale: 0.9 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8 }}
+          className="relative z-10 w-full max-w-lg"
         >
-          <div className="flex flex-col items-center p-4 bg-white dark:bg-gray-800 rounded-xl shadow-md">
-            <span className="text-4xl font-bold text-green-600 dark:text-green-400">{timeLeft.days}</span>
-            <span className="text-sm text-gray-600 dark:text-gray-300">Dias</span>
-          </div>
-          <div className="flex flex-col items-center p-4 bg-white dark:bg-gray-800 rounded-xl shadow-md">
-            <span className="text-4xl font-bold text-green-600 dark:text-green-400">{timeLeft.hours}</span>
-            <span className="text-sm text-gray-600 dark:text-gray-300">Horas</span>
-          </div>
-          <div className="flex flex-col items-center p-4 bg-white dark:bg-gray-800 rounded-xl shadow-md">
-            <span className="text-4xl font-bold text-green-600 dark:text-green-400">{timeLeft.minutes}</span>
-            <span className="text-sm text-gray-600 dark:text-gray-300">Minutos</span>
-          </div>
-          <div className="flex flex-col items-center p-4 bg-white dark:bg-gray-800 rounded-xl shadow-md">
-            <span className="text-4xl font-bold text-green-600 dark:text-green-400">{timeLeft.seconds}</span>
-            <span className="text-sm text-gray-600 dark:text-gray-300">Segundos</span>
-          </div>
+          <motion.div
+            animate={{
+              boxShadow: [
+                "0 10px 25px -5px rgba(124, 58, 237, 0.1)",
+                "0 10px 25px -5px rgba(124, 58, 237, 0.3)",
+                "0 10px 25px -5px rgba(124, 58, 237, 0.1)"
+              ]
+            }}
+            transition={{
+              duration: 2.5,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+            className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-6 bg-white/60 dark:bg-gray-800/50 backdrop-blur-lg rounded-2xl shadow-xl"
+          >
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              transition={{ type: "spring", stiffness: 300 }}
+              className="flex flex-col items-center p-4 bg-gradient-to-br from-purple-100 to-white dark:from-purple-700 dark:to-gray-800 rounded-xl shadow-md"
+            >
+              <motion.span
+                animate={{
+                  scale: [1, 1.03, 1],
+                }}
+                transition={{
+                  duration: 1.5,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+                className="text-4xl font-bold text-purple-600 dark:text-purple-300"
+              >
+                {timeLeft.days}
+              </motion.span>
+              <span className="text-sm text-gray-600 dark:text-gray-300">Dias</span>
+            </motion.div>
+
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              transition={{ type: "spring", stiffness: 300 }}
+              className="flex flex-col items-center p-4 bg-gradient-to-br from-purple-100 to-white dark:from-purple-700 dark:to-gray-800 rounded-xl shadow-md"
+            >
+              <motion.span
+                animate={{
+                  scale: [1, 1.03, 1],
+                }}
+                transition={{
+                  duration: 1.5,
+                  delay: 0.2,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+                className="text-4xl font-bold text-purple-600 dark:text-purple-300"
+              >
+                {timeLeft.hours}
+              </motion.span>
+              <span className="text-sm text-gray-600 dark:text-gray-300">Horas</span>
+            </motion.div>
+
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              transition={{ type: "spring", stiffness: 300 }}
+              className="flex flex-col items-center p-4 bg-gradient-to-br from-purple-100 to-white dark:from-purple-700 dark:to-gray-800 rounded-xl shadow-md"
+            >
+              <motion.span
+                animate={{
+                  scale: [1, 1.03, 1],
+                }}
+                transition={{
+                  duration: 1.5,
+                  delay: 0.4,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+                className="text-4xl font-bold text-purple-600 dark:text-purple-300"
+              >
+                {timeLeft.minutes}
+              </motion.span>
+              <span className="text-sm text-gray-600 dark:text-gray-300">Minutos</span>
+            </motion.div>
+
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              transition={{ type: "spring", stiffness: 300 }}
+              className="flex flex-col items-center p-4 bg-gradient-to-br from-purple-100 to-white dark:from-purple-700 dark:to-gray-800 rounded-xl shadow-md"
+            >
+              <motion.span
+                animate={{
+                  scale: [1, 1.05, 1],
+                }}
+                transition={{
+                  duration: 1,
+                  delay: 0.6,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+                className="text-4xl font-bold text-purple-600 dark:text-purple-300"
+              >
+                {timeLeft.seconds}
+              </motion.span>
+              <span className="text-sm text-gray-600 dark:text-gray-300">Segundos</span>
+            </motion.div>
+          </motion.div>
         </motion.div>
-        <p className="mt-8 text-center text-green-700 dark:text-green-200">
-          Previsão de nascimento: {dueDate.toLocaleDateString('pt-BR')}
-        </p>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.7, duration: 0.8 }}
+          className="mt-8 px-8 py-4 bg-white/30 dark:bg-purple-800/30 backdrop-blur-sm rounded-full border border-white/40 dark:border-purple-300/20 shadow-lg"
+        >
+          <p className="text-center text-purple-700 dark:text-purple-200 font-medium">
+            Previsão de nascimento: <span className="font-bold">{dueDate.toLocaleDateString('pt-BR')}</span>
+          </p>
+        </motion.div>
+
+        {/* Informação adicional sobre o contador de dias */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1, duration: 0.8 }}
+          className="mt-4 px-6 py-3 bg-white/20 dark:bg-purple-800/20 backdrop-blur-sm rounded-full border border-white/30 dark:border-purple-300/10 shadow-md"
+        >
+          <p className="text-center text-purple-600 dark:text-purple-200 text-sm font-medium">
+            Hoje é meu dia {dayCounter} 💫
+          </p>
+        </motion.div>
       </section>
 
       {/* Corações flutuantes */}
