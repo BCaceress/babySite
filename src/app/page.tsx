@@ -481,10 +481,27 @@ export default function Home() {
     };
   }, []);
 
+  // Estado para controlar se o componente já montou (para evitar hydration mismatch)
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Memoize formatted due date string (only on client after mount)
+  const formattedDueDate = useMemo(() => {
+    if (!mounted) return '';
+    return dueDate.toLocaleDateString('pt-BR');
+  }, [dueDate, mounted]);
+
   return (
     <div className="font-[family-name:var(--font-geist-sans)] overflow-y-auto snap-y snap-mandatory h-screen">
       {/* Primeira seção - Nome do bebê */}
-      <section className={`h-screen w-full flex flex-col items-center justify-center snap-start ${babyGender === 'reveal' ? `bg-gradient-to-br ${themeConfig.colors.gradient} dark:bg-gradient-to-br dark:${themeConfig.colors.gradientDark}` : `bg-${themeConfig.colors.primary} dark:bg-${themeConfig.colors.primaryDark}`} p-8 relative`}>
+      <section className={`h-screen w-full flex flex-col items-center justify-center snap-start ${babyGender === 'reveal'
+        ? 'bg-gradient-to-br from-pink-400 to-sky-400 dark:bg-gradient-to-br dark:from-pink-600 dark:to-sky-600'
+        : babyGender === 'girl'
+          ? 'bg-pink-600 dark:bg-pink-300'
+          : 'bg-sky-600 dark:bg-sky-300'} p-8 relative`}>
         <div className="flex-1 flex flex-col items-center justify-center">
           <motion.h1
             initial={{ opacity: 0, scale: 0.8 }}
@@ -1279,7 +1296,7 @@ export default function Home() {
               🗓️
             </motion.div>
             <p className="text-center font-medium bg-clip-text text-transparent bg-gradient-to-r from-pink-600 to-sky-600 dark:from-pink-300 dark:to-sky-300">
-              Vou nascer em: <span className="font-extrabold tracking-wide">{dueDate.toLocaleDateString('pt-BR')}</span>
+              Vou nascer em: <span className="font-extrabold tracking-wide">{mounted ? formattedDueDate : ''}</span>
             </p>
           </div>
         </motion.div>
