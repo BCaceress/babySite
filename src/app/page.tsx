@@ -141,7 +141,7 @@ export default function Home() {
   const toggleVideo = () => {
     const video = videoRef.current;
     if (!video) return;
-    
+
     if (video.paused) {
       video.play()
         .then(() => setIsVideoPlaying(true))
@@ -773,14 +773,14 @@ export default function Home() {
       {/* Nova seção - Vídeo da ecografia */}
       <section className="h-screen w-full flex flex-col items-center justify-center snap-start bg-gradient-to-br from-pink-400 to-sky-400 dark:bg-gradient-to-br dark:from-pink-600 dark:to-sky-600 p-8 relative overflow-hidden">
         {/* Elementos decorativos flutuantes - substituídos por ícones de bebê/vídeo */}
-        <div className="absolute top-20 left-10 floating-baby opacity-15 pointer-events-none">
-          <span className="text-4xl">🍼</span>
+        <div className="absolute top-20 left-10 floating-baby opacity-30 pointer-events-none">
+          <span className="text-4xl">👶</span>
         </div>
-        <div className="absolute top-32 right-16 floating-baby opacity-10 pointer-events-none" style={{ animationDelay: '1s' }}>
-          <span className="text-3xl">👶</span>
+        <div className="absolute top-32 right-16 floating-baby opacity-40 pointer-events-none" style={{ animationDelay: '1s' }}>
+          <span className="text-3xl">💕</span>
         </div>
-        <div className="absolute bottom-32 left-20 floating-baby opacity-10 pointer-events-none" style={{ animationDelay: '2s' }}>
-          <span className="text-4xl">📹</span>
+        <div className="absolute bottom-32 left-20 floating-baby opacity-40 pointer-events-none" style={{ animationDelay: '2s' }}>
+          <span className="text-4xl">🤰🏼</span>
         </div>
 
         <motion.h2
@@ -805,7 +805,7 @@ export default function Home() {
           initial={{ opacity: 0, scale: 0.92 }}
           whileInView={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8 }}
-          className="relative w-full max-w-xl mx-auto flex flex-col items-center"
+          className="relative w-full max-w-4xl mx-auto flex flex-col items-center"
         >
           <div className="relative aspect-video rounded-3xl overflow-hidden bg-white/20 dark:bg-gray-900/40 border-4 border-white/40 dark:border-sky-400/20 shadow-2xl flex items-center justify-center">
             <video
@@ -825,38 +825,10 @@ export default function Home() {
               <source src="/video/eco.mp4" type="video/mp4" />
               Seu navegador não suporta o elemento de vídeo.
             </video>
-            
-            {/* Botão de Play/Pause personalizado */}
-            <div 
-              className={`absolute inset-0 flex items-center justify-center cursor-pointer transition-opacity duration-300 ${isVideoPlaying ? 'opacity-0 hover:opacity-100' : 'opacity-100 bg-black/30'}`}
-              onClick={toggleVideo}
-            >
-              {!isVideoPlaying && (
-                <motion.div
-                  initial={{ scale: 0.8, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  className="w-20 h-20 bg-white/30 backdrop-blur-md rounded-full flex items-center justify-center shadow-xl border border-white/40"
-                >
-                  <svg width="30" height="30" viewBox="0 0 24 24" fill="white">
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
-                </motion.div>
-              )}
-            </div>
-            
-            {/* Controles personalizados simples */}
-            <div className={`absolute bottom-0 left-0 right-0 p-4 flex justify-center items-center transition-opacity ${isVideoPlaying ? 'opacity-0 hover:opacity-100' : 'opacity-100'}`}>
-              <button
-                onClick={toggleVideo}
-                className="px-4 py-1 bg-white/30 backdrop-blur-sm rounded-full border border-white/30 hover:bg-white/40 transition-colors text-white text-sm font-medium"
-              >
-                {isVideoPlaying ? 'Pausar' : 'Reproduzir'}
-              </button>
-            </div>
-            
+
             {/* Overlay com brilho sutil */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent rounded-2xl pointer-events-none" />
-            
+
             {/* Efeito de brilho ao passar o mouse */}
             <motion.div
               className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-2xl"
@@ -864,6 +836,33 @@ export default function Home() {
               transition={{ duration: 1.5, ease: 'easeInOut' }}
             />
           </div>
+
+          {/* Botão de reprodução movido para baixo do vídeo */}
+          <motion.button
+            onClick={toggleVideo}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            whileHover={{ scale: 1.05, y: -2 }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+            className={`mt-6 px-6 py-3 bg-white/30 backdrop-blur-md rounded-full border border-white/40 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl hover:bg-white/40 transition-all duration-300`}
+          >
+            <div className="w-10 h-10 bg-white/40 rounded-full flex items-center justify-center">
+              {isVideoPlaying ? (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+                  <rect x="6" y="4" width="4" height="16" />
+                  <rect x="14" y="4" width="4" height="16" />
+                </svg>
+              ) : (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+              )}
+            </div>
+            <span className="text-white font-medium text-sm">
+              {isVideoPlaying ? 'Pausar Vídeo' : 'Reproduzir Vídeo'}
+            </span>
+          </motion.button>
         </motion.div>
       </section>
 
