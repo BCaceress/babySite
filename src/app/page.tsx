@@ -26,7 +26,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 export default function Home() {
   // ====== CONFIGURAÇÕES DO BEBÊ - ALTERE AQUI ======
   const babyName = "Noah"; // Altere para "Lívia" ou "Noah"
-  const babyGender = "boy" as "girl" | "boy"; // "girl" para menina ou "boy" para menino
+  const babyGender = "boy" as "girl" | "boy" | "reveal"; // "girl" para menina, "boy" para menino ou "reveal" para chá revelação
   const dueDate = useMemo(() => new Date("January 14, 2026"), []); // Data estimada de nascimento
 
   // Calcula o número de dias desde uma data de referência (dia 82 = 30 de junho de 2025)
@@ -40,6 +40,22 @@ export default function Home() {
 
   // Configurações de tema baseadas no gênero
   const themeConfig = useMemo(() => {
+    if (babyGender === "reveal") {
+      return {
+        colors: {
+          primary: "pink-500",
+          primaryDark: "pink-300",
+          secondary: "sky-600",
+          secondaryDark: "sky-300",
+          gradient: "from-pink-400 to-sky-400",
+          gradientDark: "from-pink-600 to-sky-600",
+          accent: "purple-500",
+          accentDark: "purple-200"
+        },
+        message: "Chá revelação! 💖💙",
+        emoji: "🎉"
+      };
+    }
     if (babyGender === "girl") {
       return {
         colors: {
@@ -47,28 +63,43 @@ export default function Home() {
           primaryDark: "pink-300",
           secondary: "pink-700",
           secondaryDark: "pink-200",
-          gradient: "from-pink-100 to-pink-200",
-          gradientDark: "from-pink-500 to-pink-300",
+          gradient: "from-pink-400 to-pink-600",
+          gradientDark: "from-pink-700 to-pink-500",
           accent: "pink-800",
           accentDark: "pink-100"
         },
         message: "Uma princesinha está a caminho! 👑",
         emoji: "🩷"
       };
-    } else {
+    } else if (babyGender === "boy") {
       return {
         colors: {
-          primary: "blue-600",
-          primaryDark: "blue-300",
-          secondary: "blue-700",
-          secondaryDark: "blue-200",
-          gradient: "from-blue-100 to-blue-200",
-          gradientDark: "from-blue-900 to-indigo-900",
-          accent: "blue-800",
-          accentDark: "blue-100"
+          primary: "sky-600",
+          primaryDark: "sky-300",
+          secondary: "sky-700",
+          secondaryDark: "sky-200",
+          gradient: "from-sky-400 to-sky-600",
+          gradientDark: "from-sky-800 to-sky-700",
+          accent: "sky-800",
+          accentDark: "sky-100"
         },
         message: "Um pequeno príncipe está a caminho! 🤴",
         emoji: "💙"
+      };
+    } else {
+      return {
+        colors: {
+          primary: "purple-600",
+          primaryDark: "purple-300",
+          secondary: "purple-700",
+          secondaryDark: "purple-200",
+          gradient: "from-purple-400 to-purple-600",
+          gradientDark: "from-purple-700 to-purple-500",
+          accent: "purple-800",
+          accentDark: "purple-100"
+        },
+        message: "Surpresa! O bebê é uma caixinha de mistério! 🎁",
+        emoji: "🟣"
       };
     }
   }, [babyGender]);
@@ -105,12 +136,12 @@ export default function Home() {
   // Função para criar corações flutuantes
   const createFloatingHearts = (clickX: number, clickY: number) => {
     const heartEmojis = babyGender === 'girl'
-      ? ['💕', '💖', '🩰', '🧸', '👧🏼', '💘', '🌸', '🎀', '🥰']
-      : ['💙', '🍼', '🤍', '⚽', '🦖', '⭐', '🤴', '👶', '🚗'];
+      ? ['💕', '💖', '🩰', '🧸', '👧🏼', '💘', '🌸', '🎀', '🥰', '👗']
+      : ['💙', '🍼', '🤍', '⚽', '🦖', '⭐', '🤴', '👶', '🚗', '🚀', '❤️'];
 
     const newHearts = Array.from({ length: 6 }, (_, i) => ({
       id: Date.now() + i + Math.random() * 1000,
-      x: clickX + (Math.random() - 0.5) * 450, // Maior espalhamento
+      x: clickX + (Math.random() - 0.5) * 460, // Maior espalhamento
       y: clickY + (Math.random() - 0.5) * 100, // Pequena variação vertical
       emoji: heartEmojis[Math.floor(Math.random() * heartEmojis.length)]
     }));
@@ -434,13 +465,13 @@ export default function Home() {
   return (
     <div className="font-[family-name:var(--font-geist-sans)] overflow-y-auto snap-y snap-mandatory h-screen">
       {/* Primeira seção - Nome do bebê */}
-      <section className={`h-screen w-full flex flex-col items-center justify-center snap-start bg-gradient-to-b ${themeConfig.colors.gradient} dark:${themeConfig.colors.gradientDark} p-8 relative`}>
+      <section className={`h-screen w-full flex flex-col items-center justify-center snap-start ${babyGender === 'reveal' ? `bg-gradient-to-br ${themeConfig.colors.gradient} dark:bg-gradient-to-br dark:${themeConfig.colors.gradientDark}` : `bg-${themeConfig.colors.primary} dark:bg-${themeConfig.colors.primaryDark}`} p-8 relative`}>
         <div className="flex-1 flex flex-col items-center justify-center">
           <motion.h1
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1 }}
-            className={`text-6xl font-bold text-center ${babyName === "Noah" ? "name-gradient-noah" : "name-gradient-livia"}`}
+            className="text-7xl font-extrabold text-white drop-shadow-lg text-center"
           >
             {babyName}
           </motion.h1>
@@ -448,10 +479,40 @@ export default function Home() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5, duration: 1 }}
-            className={`text-xl mt-4 text-center text-${themeConfig.colors.secondary} dark:text-${themeConfig.colors.secondaryDark}`}
+            className="text-lg mt-4 text-center text-white/90 max-w-md leading-relaxed"
           >
             {themeConfig.message}
           </motion.p>
+
+          {/* Contador de dias - realocado da seção final */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.6, ease: [0.43, 0.13, 0.23, 0.96] }}
+            className="mt-6 px-6 py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/20 shadow-lg"
+          >
+            <div className="flex items-center justify-center space-x-3">
+              <motion.div
+                className="w-5 h-5 text-base"
+                animate={{
+                  y: [0, -3, 0],
+                  opacity: [0.9, 1, 0.9],
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+              >
+                👶🏻
+              </motion.div>
+              <p className="text-center text-white text-sm font-medium">
+                Estou completando <span className="font-extrabold">{dayCounter} dias</span> hoje!
+              </p>
+            </div>
+          </motion.div>
+
+
 
           {/* Badge com emoji temático - Interativo */}
           <motion.div
@@ -460,7 +521,7 @@ export default function Home() {
             transition={{ delay: 1, duration: 0.8 }}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="mt-6 px-6 py-3 bg-white/20 dark:bg-gray-800/30 backdrop-blur-sm rounded-full border border-white/40 dark:border-gray-300/20 cursor-pointer hover:bg-white/30 dark:hover:bg-gray-800/40 transition-all duration-300 group"
+            className="mt-25 px-6 py-3 bg-white/20 dark:bg-gray-800/30 backdrop-blur-sm rounded-full border border-white/40 dark:border-gray-300/20 cursor-pointer hover:bg-white/30 dark:hover:bg-gray-800/40 transition-all duration-300 group"
             onClick={(e: React.MouseEvent) => {
               // Pega as coordenadas do clique
               const clickX = e.clientX;
@@ -600,12 +661,12 @@ export default function Home() {
           </div>
         </motion.div>
       </section>        {/* Segunda seção - Ecografia com efeito de raspadinha */}
-      <section className="h-screen w-full flex flex-col items-center justify-center snap-start bg-gradient-to-br from-purple-100 via-pink-50 to-purple-200 dark:from-purple-900 dark:via-purple-800 dark:to-indigo-900 p-8">
+      <section className="h-screen w-full flex flex-col items-center justify-center snap-start bg-gradient-to-br from-pink-400 to-sky-400 dark:bg-gradient-to-br dark:from-pink-600 dark:to-sky-600 p-8">
         <motion.h2
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           transition={{ duration: 1 }}
-          className="text-4xl font-bold mb-4 text-purple-600 dark:text-purple-300 text-center"
+          className={`text-4xl font-bold mb-4 text-${themeConfig.colors.secondary} dark:text-${themeConfig.colors.secondaryDark} text-center`}
         >
           Minha primeira foto
         </motion.h2>
@@ -614,9 +675,9 @@ export default function Home() {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           transition={{ duration: 1, delay: 0.3 }}
-          className="text-center text-purple-700 dark:text-purple-200 mb-8 px-4"
+          className={`text-center text-${themeConfig.colors.secondaryDark} dark:text-${themeConfig.colors.accentDark} mb-8 px-4`}
         >
-          Raspe a tela para revelar minha primeira pose na barriga da mamãe! 💕
+          Raspe a tela para revelar minha primeira pose na barriga da mamãe! {themeConfig.emoji}
         </motion.p>
 
         <motion.div
@@ -627,7 +688,7 @@ export default function Home() {
         >
           <div
             ref={containerRef}
-            className={`scratch-container relative aspect-square rounded-2xl overflow-hidden shadow-2xl bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-700 dark:to-purple-900 border-4 border-white/50 dark:border-purple-300/20 ${isScratching ? 'scratching' : ''}`}
+            className={`scratch-container relative aspect-square rounded-2xl overflow-hidden bg-white/10 backdrop-blur-lg border-4 border-${themeConfig.colors.primary}-300/30 dark:border-${themeConfig.colors.primaryDark}-300/30 shadow-2xl ${isScratching ? 'scratching' : ''}`}
             style={{ touchAction: 'none' }}
           >
             <div className="absolute inset-0 z-10">
@@ -691,12 +752,12 @@ export default function Home() {
       </section>
 
       {/* Nova seção - Vídeo da ecografia */}
-      <section className="h-screen w-full flex flex-col items-center justify-center snap-start bg-gradient-to-tl from-indigo-100 via-purple-100 to-pink-100 dark:from-indigo-900 dark:via-purple-900 dark:to-purple-800 p-8">
+      <section className="h-screen w-full flex flex-col items-center justify-center snap-start bg-gradient-to-br from-pink-400 to-sky-400 dark:bg-gradient-to-br dark:from-pink-600 dark:to-sky-600 p-8">
         <motion.h2
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           transition={{ duration: 1 }}
-          className="text-4xl font-bold mb-4 text-purple-600 dark:text-purple-300 text-center"
+          className={`text-4xl font-bold mb-4 text-${themeConfig.colors.secondary} dark:text-${themeConfig.colors.secondaryDark} text-center`}
         >
           Veja como me mexo!
         </motion.h2>
@@ -705,9 +766,9 @@ export default function Home() {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           transition={{ duration: 1, delay: 0.3 }}
-          className="text-center text-purple-700 dark:text-purple-200 mb-8 px-4"
+          className={`text-center text-${themeConfig.colors.secondaryDark} dark:text-${themeConfig.colors.accentDark} mb-8 px-4`}
         >
-          Aqui você pode me ver mexendo dentro da barriga da mamãe! 👶
+          Aqui você pode me ver mexendo dentro da barriga da mamãe! {themeConfig.emoji}
         </motion.p>
 
         <motion.div
@@ -716,7 +777,7 @@ export default function Home() {
           transition={{ duration: 0.8 }}
           className="relative w-full max-w-lg mx-auto"
         >
-          <div className="relative aspect-video rounded-2xl overflow-hidden shadow-2xl bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-800 dark:to-purple-900 border-4 border-white/50 dark:border-purple-300/20">
+          <div className={`relative aspect-video rounded-2xl overflow-hidden bg-white/10 backdrop-blur-lg border-4 border-${themeConfig.colors.primary}-300/30 dark:border-${themeConfig.colors.primaryDark}-300/30 shadow-2xl`}>
             <video
               className="w-full h-full object-cover rounded-xl"
               controls
@@ -821,31 +882,31 @@ export default function Home() {
       </section>
 
       {/* Quarta seção - Batimento cardíaco */}
-      <section className="h-screen w-full flex flex-col items-center justify-center snap-start bg-gradient-to-tr from-pink-100 via-purple-100 to-indigo-100 dark:from-pink-900 dark:via-purple-900 dark:to-indigo-900 p-8 relative overflow-hidden">
+      <section className="h-screen w-full flex flex-col items-center justify-center snap-start bg-gradient-to-br from-pink-400 to-sky-400 dark:bg-gradient-to-br dark:from-pink-600 dark:to-sky-600 p-8 mb-25 relative overflow-hidden">
         <motion.h2
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           transition={{ duration: 1 }}
-          className="text-4xl font-bold mb-8 text-purple-600 dark:text-purple-300"
+          className="text-4xl font-bold mb-14 text-white dark:text-white"
         >
           Ouça meu coração
         </motion.h2>
 
         {/* Coração flutuante delicado no fundo */}
         <div className="absolute top-20 left-10 floating-heart opacity-20">
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor" className="text-pink-400">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor" className="text-pink-100">
             <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
           </svg>
         </div>
 
         <div className="absolute top-32 right-16 floating-heart opacity-15" style={{ animationDelay: '1s' }}>
-          <svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor" className="text-pink-300">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor" className="text-pink-100">
             <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
           </svg>
         </div>
 
         <div className="absolute bottom-32 left-20 floating-heart opacity-10" style={{ animationDelay: '2s' }}>
-          <svg width="35" height="35" viewBox="0 0 24 24" fill="currentColor" className="text-pink-500">
+          <svg width="35" height="35" viewBox="0 0 24 24" fill="currentColor" className="text-pink-100">
             <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
           </svg>
         </div>
@@ -947,183 +1008,295 @@ export default function Home() {
       </section>
 
       {/* Quinta seção - Contagem regressiva */}
-      <section className="h-screen w-full flex flex-col items-center justify-center snap-start bg-gradient-to-bl from-purple-200 via-indigo-100 to-purple-100 dark:from-purple-800 dark:via-indigo-900 dark:to-purple-900 p-8 relative overflow-hidden">
-        {/* Elementos decorativos flutuantes - Relógio e calendários */}
-        <div className="absolute top-16 right-20 floating-heart opacity-20">
-          {/* Relógio */}
-          <svg width="35" height="35" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-purple-400">
+      <section className="h-screen w-full flex flex-col items-center justify-center snap-start bg-gradient-to-br from-pink-400 to-sky-400 dark:bg-gradient-to-br dark:from-pink-600 dark:to-sky-600 p-8 relative overflow-hidden">
+        {/* Partículas animadas flutuantes */}
+        <div className="absolute inset-0 overflow-hidden">
+          {Array.from({ length: 15 }).map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute opacity-20 backdrop-blur-3xl"
+              initial={{
+                x: Math.random() * 100 - 50 + "%",
+                y: Math.random() * 100 - 50 + "%",
+                scale: Math.random() * 0.5 + 0.5,
+              }}
+              animate={{
+                x: [
+                  Math.random() * 100 - 50 + "%",
+                  Math.random() * 100 - 50 + "%",
+                  Math.random() * 100 - 50 + "%",
+                ],
+                y: [
+                  Math.random() * 100 - 50 + "%",
+                  Math.random() * 100 - 50 + "%",
+                  Math.random() * 100 - 50 + "%",
+                ],
+                opacity: [0.1, 0.2, 0.1],
+              }}
+              transition={{
+                duration: 15 + Math.random() * 15,
+                ease: "easeInOut",
+                repeat: Infinity,
+                repeatType: "reverse",
+              }}
+              style={{
+                width: 100 + Math.random() * 100,
+                height: 100 + Math.random() * 100,
+                borderRadius: "50%",
+                background: `radial-gradient(circle, ${i % 2 === 0 ? "rgba(244, 114, 182, 0.15)" : "rgba(125, 211, 252, 0.15)"
+                  } 0%, transparent 70%)`,
+              }}
+            />
+          ))}
+        </div>
+
+        {/* Elementos decorativos temáticos */}
+        <motion.div
+          className="absolute top-16 right-20 w-12 h-12 opacity-30"
+          animate={{
+            y: [0, -10, 0],
+            rotate: [0, 5, 0],
+          }}
+          transition={{
+            duration: 6,
+            ease: "easeInOut",
+            repeat: Infinity,
+            repeatType: "reverse",
+          }}
+        >
+          {/* Relógio moderno */}
+          <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="12" cy="12" r="10" />
-            <path d="M12 6v6l4 2" />
+            <motion.path
+              d="M12 6v6l4 2"
+              animate={{
+                pathLength: [0, 1],
+                opacity: [0.6, 1]
+              }}
+              transition={{
+                duration: 5,
+                repeat: Infinity,
+                repeatType: "reverse",
+                ease: "easeInOut",
+              }}
+            />
           </svg>
-        </div>
+        </motion.div>
 
-        <div className="absolute top-24 left-28 floating-heart opacity-15" style={{ animationDelay: '1.5s' }}>
-          {/* Calendário estilo 1 */}
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-indigo-300">
-            <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+        <motion.div
+          className="absolute top-24 left-16 w-14 h-14 opacity-20"
+          animate={{
+            y: [0, -12, 0],
+            scale: [1, 1.05, 1],
+            rotate: [0, -3, 0],
+          }}
+          transition={{
+            duration: 8,
+            ease: "easeInOut",
+            repeat: Infinity,
+            repeatType: "reverse",
+            delay: 1,
+          }}
+        >
+          {/* Calendário estilizado */}
+          <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="3" ry="3" />
             <line x1="16" y1="2" x2="16" y2="6" />
             <line x1="8" y1="2" x2="8" y2="6" />
-            <line x1="3" y1="10" x2="21" y2="10" />
-            <path d="M8 14h.01" />
-            <path d="M12 14h.01" />
-            <path d="M16 14h.01" />
-            <path d="M8 18h.01" />
-            <path d="M12 18h.01" />
-            <path d="M16 18h.01" />
+            <motion.line
+              x1="3"
+              y1="10"
+              x2="21"
+              y2="10"
+              animate={{
+                pathLength: [0, 1],
+                opacity: [0.3, 1, 0.3]
+              }}
+              transition={{
+                duration: 4,
+                repeat: Infinity,
+                repeatType: "reverse",
+                ease: "easeInOut",
+              }}
+            />
+            <motion.path
+              d="M9 15h2m2 0h2m-6 3h2m2 0h2"
+              strokeDasharray="0.9 2"
+              animate={{
+                pathLength: [0, 1],
+                opacity: [0.5, 1]
+              }}
+              transition={{
+                duration: 6,
+                repeat: Infinity,
+                repeatType: "reverse",
+                ease: "easeInOut",
+                delay: 2
+              }}
+            />
           </svg>
-        </div>
+        </motion.div>
 
-        <div className="absolute bottom-28 right-20 floating-heart opacity-10" style={{ animationDelay: '2.2s' }}>
-          {/* Calendário estilo 2 */}
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-purple-500">
-            <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-            <line x1="16" y1="2" x2="16" y2="6" />
-            <line x1="8" y1="2" x2="8" y2="6" />
-            <line x1="3" y1="10" x2="21" y2="10" />
-            <rect x="7" y="14" width="4" height="4" />
+        <motion.div
+          className="absolute bottom-20 right-24 w-16 h-16 opacity-25"
+          animate={{
+            scale: [1, 1.08, 1],
+            rotate: [0, 3, 0],
+            y: [0, -8, 0],
+          }}
+          transition={{
+            duration: 7,
+            ease: "easeInOut",
+            repeat: Infinity,
+            delay: 2,
+          }}
+        >
+          {/* Símbolo de bebê */}
+          <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.2">
+            <circle cx="12" cy="6" r="3.5" />
+            <path d="M8 14l-1 8h10l-1-8" />
+            <path d="M8 14c0-2.2 1.8-4 4-4s4 1.8 4 4" />
+            <motion.path
+              d="M6 18h12"
+              animate={{
+                pathLength: [0, 1],
+                opacity: [0.2, 0.8, 0.2]
+              }}
+              transition={{
+                duration: 5,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: 1
+              }}
+            />
           </svg>
-        </div>
+        </motion.div>
 
         <motion.h2
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           transition={{ duration: 1 }}
-          className="text-4xl font-bold mb-8 text-purple-600 dark:text-purple-300"
+          className="relative z-10 text-5xl font-bold mb-5 bg-clip-text text-transparent bg-gradient-to-r from-white to-pink-100 dark:from-white dark:to-sky-200"
         >
           Estou chegando em
         </motion.h2>
 
+        {/* Container do countdown principal */}
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           whileInView={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8 }}
           className="relative z-10 w-full max-w-lg"
         >
+          {/* Brilho de fundo para o contador */}
+          <div className="absolute -inset-6 bg-gradient-to-r from-pink-500/20 to-sky-500/20 rounded-3xl blur-xl">
+            <motion.div
+              className="absolute inset-0 bg-gradient-to-r from-pink-500/10 to-sky-500/10 rounded-3xl"
+              animate={{
+                opacity: [0.3, 0.6, 0.3],
+              }}
+              transition={{
+                duration: 3,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+            />
+          </div>
+
           <motion.div
             animate={{
               boxShadow: [
-                "0 10px 25px -5px rgba(124, 58, 237, 0.1)",
-                "0 10px 25px -5px rgba(124, 58, 237, 0.3)",
-                "0 10px 25px -5px rgba(124, 58, 237, 0.1)"
+                "0 15px 30px -5px rgba(236, 72, 153, 0.2), 0 8px 10px -6px rgba(14, 165, 233, 0.1)",
+                "0 15px 30px -5px rgba(14, 165, 233, 0.2), 0 8px 10px -6px rgba(236, 72, 153, 0.1)",
+                "0 15px 30px -5px rgba(236, 72, 153, 0.2), 0 8px 10px -6px rgba(14, 165, 233, 0.1)",
               ]
             }}
             transition={{
-              duration: 2.5,
+              duration: 6,
               repeat: Infinity,
               ease: "easeInOut"
             }}
-            className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-6 bg-white/60 dark:bg-gray-800/50 backdrop-blur-lg rounded-2xl shadow-xl"
+            className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-8 bg-white/40 dark:bg-gray-900/40 backdrop-blur-xl rounded-2xl shadow-xl border border-white/30 dark:border-sky-500/10"
           >
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              transition={{ type: "spring", stiffness: 300 }}
-              className="flex flex-col items-center p-4 bg-gradient-to-br from-purple-100 to-white dark:from-purple-700 dark:to-gray-800 rounded-xl shadow-md"
-            >
-              <motion.span
-                animate={{
-                  scale: [1, 1.03, 1],
+            {/* Componentes de contagem animados */}
+            {[
+              { value: timeLeft.days, label: "Dias", delay: 0 },
+              { value: timeLeft.hours, label: "Horas", delay: 0.2 },
+              { value: timeLeft.minutes, label: "Minutos", delay: 0.4 },
+              { value: timeLeft.seconds, label: "Segundos", delay: 0.6 },
+            ].map((item, index) => (
+              <motion.div
+                key={index}
+                whileHover={{
+                  scale: 1.05,
+                  boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+                  backgroundColor: "rgba(255, 255, 255, 0.95)"
                 }}
-                transition={{
-                  duration: 1.5,
-                  repeat: Infinity,
-                  ease: "easeInOut"
-                }}
-                className="text-4xl font-bold text-purple-600 dark:text-purple-300"
+                transition={{ type: "spring", stiffness: 400 }}
+                className="flex flex-col items-center p-4 bg-gradient-to-br from-white/80 to-white/60 dark:from-gray-800/90 dark:to-gray-900/80 rounded-xl shadow-lg border border-white/50 dark:border-sky-500/10 backdrop-blur-sm"
               >
-                {timeLeft.days}
-              </motion.span>
-              <span className="text-sm text-gray-600 dark:text-gray-300">Dias</span>
-            </motion.div>
+                <div className="relative w-full">
+                  <motion.div
+                    animate={{
+                      scale: [1, 1.06, 1],
+                    }}
+                    transition={{
+                      duration: 1.5,
+                      delay: item.delay,
+                      repeat: Infinity,
+                      ease: "easeInOut"
+                    }}
+                    className="relative z-10 text-4xl sm:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-pink-500 to-sky-500 dark:from-pink-400 dark:to-sky-400 text-center"
+                  >
+                    {item.value}
+                  </motion.div>
 
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              transition={{ type: "spring", stiffness: 300 }}
-              className="flex flex-col items-center p-4 bg-gradient-to-br from-purple-100 to-white dark:from-purple-700 dark:to-gray-800 rounded-xl shadow-md"
-            >
-              <motion.span
-                animate={{
-                  scale: [1, 1.03, 1],
-                }}
-                transition={{
-                  duration: 1.5,
-                  delay: 0.2,
-                  repeat: Infinity,
-                  ease: "easeInOut"
-                }}
-                className="text-4xl font-bold text-purple-600 dark:text-purple-300"
-              >
-                {timeLeft.hours}
-              </motion.span>
-              <span className="text-sm text-gray-600 dark:text-gray-300">Horas</span>
-            </motion.div>
-
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              transition={{ type: "spring", stiffness: 300 }}
-              className="flex flex-col items-center p-4 bg-gradient-to-br from-purple-100 to-white dark:from-purple-700 dark:to-gray-800 rounded-xl shadow-md"
-            >
-              <motion.span
-                animate={{
-                  scale: [1, 1.03, 1],
-                }}
-                transition={{
-                  duration: 1.5,
-                  delay: 0.4,
-                  repeat: Infinity,
-                  ease: "easeInOut"
-                }}
-                className="text-4xl font-bold text-purple-600 dark:text-purple-300"
-              >
-                {timeLeft.minutes}
-              </motion.span>
-              <span className="text-sm text-gray-600 dark:text-gray-300">Minutos</span>
-            </motion.div>
-
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              transition={{ type: "spring", stiffness: 300 }}
-              className="flex flex-col items-center p-4 bg-gradient-to-br from-purple-100 to-white dark:from-purple-700 dark:to-gray-800 rounded-xl shadow-md"
-            >
-              <motion.span
-                animate={{
-                  scale: [1, 1.05, 1],
-                }}
-                transition={{
-                  duration: 1,
-                  delay: 0.6,
-                  repeat: Infinity,
-                  ease: "easeInOut"
-                }}
-                className="text-4xl font-bold text-purple-600 dark:text-purple-300"
-              >
-                {timeLeft.seconds}
-              </motion.span>
-              <span className="text-sm text-gray-600 dark:text-gray-300">Segundos</span>
-            </motion.div>
+                  {/* Reflexo sutil */}
+                  <div className="absolute top-[55%] left-0 w-full h-[45%] bg-gradient-to-b from-transparent to-white/10 dark:to-white/5 -scale-y-100 blur-[1px] opacity-50 rounded-xl"></div>
+                </div>
+                <span className="mt-2 text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-300 bg-clip-text">
+                  {item.label}
+                </span>
+              </motion.div>
+            ))}
           </motion.div>
         </motion.div>
 
+        {/* Detalhes de data de nascimento */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.7, duration: 0.8 }}
-          className="mt-8 px-8 py-4 bg-white/30 dark:bg-purple-800/30 backdrop-blur-sm rounded-full border border-white/40 dark:border-purple-300/20 shadow-lg"
+          className="relative z-10 mt-8 px-8 py-4 bg-white/30 dark:bg-gray-900/40 backdrop-blur-md rounded-full border border-white/40 dark:border-sky-500/20 shadow-lg"
         >
-          <p className="text-center text-purple-700 dark:text-purple-200 font-medium">
-            Previsão de nascimento: <span className="font-bold">{dueDate.toLocaleDateString('pt-BR')}</span>
-          </p>
-        </motion.div>
+          {/* Efeito de brilho dinâmico */}
+          <motion.div
+            className="absolute inset-0 rounded-full bg-gradient-to-r from-pink-500/10 via-transparent to-sky-500/10"
+            animate={{
+              backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
+            }}
+            transition={{
+              duration: 5,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+            style={{
+              backgroundSize: "200% 100%",
+            }}
+          />
 
-        {/* Informação adicional sobre o contador de dias */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1, duration: 0.8 }}
-          className="mt-4 px-6 py-3 bg-white/20 dark:bg-purple-800/20 backdrop-blur-sm rounded-full border border-white/30 dark:border-purple-300/10 shadow-md"
-        >
-          <p className="text-center text-purple-600 dark:text-purple-200 text-sm font-medium">
-            Hoje é meu dia {dayCounter} 💫
-          </p>
+          <div className="flex items-center justify-center space-x-2">
+            <motion.div
+              animate={{ scale: [1, 1.08, 1] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+              className="w-6 h-6 text-lg"
+            >
+              🗓️
+            </motion.div>
+            <p className="text-center font-medium bg-clip-text text-transparent bg-gradient-to-r from-pink-600 to-sky-600 dark:from-pink-300 dark:to-sky-300">
+              Vou nascer em: <span className="font-extrabold tracking-wide">{dueDate.toLocaleDateString('pt-BR')}</span>
+            </p>
+          </div>
         </motion.div>
       </section>
 
