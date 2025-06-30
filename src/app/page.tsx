@@ -133,6 +133,25 @@ export default function Home() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Estado para controlar o vídeo
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  // Função para controlar play/pause do vídeo
+  const toggleVideo = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    
+    if (video.paused) {
+      video.play()
+        .then(() => setIsVideoPlaying(true))
+        .catch(() => setIsVideoPlaying(false));
+    } else {
+      video.pause();
+      setIsVideoPlaying(false);
+    }
+  };
+
   // Função para criar corações flutuantes
   const createFloatingHearts = (clickX: number, clickY: number) => {
     const heartEmojis = babyGender === 'girl'
@@ -752,12 +771,23 @@ export default function Home() {
       </section>
 
       {/* Nova seção - Vídeo da ecografia */}
-      <section className="h-screen w-full flex flex-col items-center justify-center snap-start bg-gradient-to-br from-pink-400 to-sky-400 dark:bg-gradient-to-br dark:from-pink-600 dark:to-sky-600 p-8">
+      <section className="h-screen w-full flex flex-col items-center justify-center snap-start bg-gradient-to-br from-pink-400 to-sky-400 dark:bg-gradient-to-br dark:from-pink-600 dark:to-sky-600 p-8 relative overflow-hidden">
+        {/* Elementos decorativos flutuantes - substituídos por ícones de bebê/vídeo */}
+        <div className="absolute top-20 left-10 floating-baby opacity-15 pointer-events-none">
+          <span className="text-4xl">🍼</span>
+        </div>
+        <div className="absolute top-32 right-16 floating-baby opacity-10 pointer-events-none" style={{ animationDelay: '1s' }}>
+          <span className="text-3xl">👶</span>
+        </div>
+        <div className="absolute bottom-32 left-20 floating-baby opacity-10 pointer-events-none" style={{ animationDelay: '2s' }}>
+          <span className="text-4xl">📹</span>
+        </div>
+
         <motion.h2
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           transition={{ duration: 1 }}
-          className={`text-4xl font-bold mb-4 text-${themeConfig.colors.secondary} dark:text-${themeConfig.colors.secondaryDark} text-center`}
+          className={`text-4xl font-bold mb-6 text-white dark:text-white text-center drop-shadow-lg`}
         >
           Veja como me mexo!
         </motion.h2>
@@ -766,118 +796,74 @@ export default function Home() {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           transition={{ duration: 1, delay: 0.3 }}
-          className={`text-center text-${themeConfig.colors.secondaryDark} dark:text-${themeConfig.colors.accentDark} mb-8 px-4`}
+          className={`text-center text-white/80 dark:text-sky-100 mb-10 px-4 text-lg`}
         >
           Aqui você pode me ver mexendo dentro da barriga da mamãe! {themeConfig.emoji}
         </motion.p>
 
         <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, scale: 0.92 }}
+          whileInView={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8 }}
-          className="relative w-full max-w-lg mx-auto"
+          className="relative w-full max-w-xl mx-auto flex flex-col items-center"
         >
-          <div className={`relative aspect-video rounded-2xl overflow-hidden bg-white/10 backdrop-blur-lg border-4 border-${themeConfig.colors.primary}-300/30 dark:border-${themeConfig.colors.primaryDark}-300/30 shadow-2xl`}>
+          <div className="relative aspect-video rounded-3xl overflow-hidden bg-white/20 dark:bg-gray-900/40 border-4 border-white/40 dark:border-sky-400/20 shadow-2xl flex items-center justify-center">
             <video
-              className="w-full h-full object-cover rounded-xl"
-              controls
+              ref={videoRef}
+              className="w-full h-full object-cover rounded-2xl shadow-xl"
               preload="metadata"
               poster="/images/ecografia1.jpg"
+              style={{ background: 'linear-gradient(135deg, rgba(236,72,153,0.08) 0%, rgba(14,165,233,0.08) 100%)' }}
+              onPlay={() => setIsVideoPlaying(true)}
+              onPause={() => setIsVideoPlaying(false)}
+              onEnded={() => setIsVideoPlaying(false)}
+              controlsList="nofullscreen nodownload"
+              disablePictureInPicture
+              disableRemotePlayback
+              playsInline
             >
               <source src="/video/eco.mp4" type="video/mp4" />
               Seu navegador não suporta o elemento de vídeo.
             </video>
-
+            
+            {/* Botão de Play/Pause personalizado */}
+            <div 
+              className={`absolute inset-0 flex items-center justify-center cursor-pointer transition-opacity duration-300 ${isVideoPlaying ? 'opacity-0 hover:opacity-100' : 'opacity-100 bg-black/30'}`}
+              onClick={toggleVideo}
+            >
+              {!isVideoPlaying && (
+                <motion.div
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  className="w-20 h-20 bg-white/30 backdrop-blur-md rounded-full flex items-center justify-center shadow-xl border border-white/40"
+                >
+                  <svg width="30" height="30" viewBox="0 0 24 24" fill="white">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                </motion.div>
+              )}
+            </div>
+            
+            {/* Controles personalizados simples */}
+            <div className={`absolute bottom-0 left-0 right-0 p-4 flex justify-center items-center transition-opacity ${isVideoPlaying ? 'opacity-0 hover:opacity-100' : 'opacity-100'}`}>
+              <button
+                onClick={toggleVideo}
+                className="px-4 py-1 bg-white/30 backdrop-blur-sm rounded-full border border-white/30 hover:bg-white/40 transition-colors text-white text-sm font-medium"
+              >
+                {isVideoPlaying ? 'Pausar' : 'Reproduzir'}
+              </button>
+            </div>
+            
             {/* Overlay com brilho sutil */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent rounded-xl pointer-events-none" />
-
+            <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent rounded-2xl pointer-events-none" />
+            
             {/* Efeito de brilho ao passar o mouse */}
             <motion.div
-              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-xl"
-              whileHover={{
-                x: ['-100%', '100%']
-              }}
-              transition={{
-                duration: 1.5,
-                ease: "easeInOut"
-              }}
+              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-2xl"
+              whileHover={{ x: ['-100%', '100%'] }}
+              transition={{ duration: 1.5, ease: 'easeInOut' }}
             />
           </div>
-
-          {/* Decoração ao redor do vídeo */}
-          <motion.div
-            className="absolute -top-4 -left-4 text-2xl"
-            animate={{
-              rotate: [0, 5, 0, -5, 0],
-              scale: [1, 1.1, 1]
-            }}
-            transition={{
-              duration: 3,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-          >
-            🎬
-          </motion.div>
-
-          <motion.div
-            className="absolute -top-4 -right-4 text-2xl"
-            animate={{
-              rotate: [0, -5, 0, 5, 0],
-              scale: [1, 1.1, 1]
-            }}
-            transition={{
-              duration: 3,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: 1.5
-            }}
-          >
-            ✨
-          </motion.div>
-
-          <motion.div
-            className="absolute -bottom-4 -left-4 text-2xl"
-            animate={{
-              y: [0, -5, 0],
-              scale: [1, 1.1, 1]
-            }}
-            transition={{
-              duration: 2.5,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: 0.5
-            }}
-          >
-            🎥
-          </motion.div>
-
-          <motion.div
-            className="absolute -bottom-4 -right-4 text-2xl"
-            animate={{
-              rotate: [0, 10, 0, -10, 0],
-              scale: [1, 1.2, 1]
-            }}
-            transition={{
-              duration: 4,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: 2
-            }}
-          >
-            💫
-          </motion.div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1, duration: 0.8 }}
-          className="mt-8 px-6 py-3 bg-white/20 dark:bg-purple-800/30 backdrop-blur-sm rounded-full border border-white/40 dark:border-purple-300/20"
-        >
-          <p className="text-center text-purple-700 dark:text-purple-200 font-medium text-sm">
-            🎭 Minha primeira performance ao vivo! Estou ensaiando para quando chegar! 🎪
-          </p>
         </motion.div>
       </section>
 
