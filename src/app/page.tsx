@@ -879,7 +879,7 @@ export default function Home() {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           transition={{ duration: 1 }}
-          className="text-4xl font-bold mb-14 text-white dark:text-white"
+          className="text-3xl font-bold mb-14 text-white dark:text-white"
         >
           Ouça meu coração
         </motion.h2>
