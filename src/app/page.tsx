@@ -27,7 +27,7 @@ export default function Home() {
   // ====== CONFIGURAÇÕES DO BEBÊ - ALTERE AQUI ======
   const babyName = "Noah"; // Altere para "Lívia" ou "Noah"
   const babyGender = "boy" as "girl" | "boy" | "reveal"; // "girl" para menina, "boy" para menino ou "reveal" para chá revelação
-  const dueDate = useMemo(() => new Date("January 14, 2026"), []); // Data estimada de nascimento
+  const dueDate = useMemo(() => new Date("January 11, 2026"), []); // Data estimada de nascimento
 
   // Estado para armazenar o tempo restante
   const [timeLeft, setTimeLeft] = useState({
@@ -367,22 +367,8 @@ export default function Home() {
     };
 
     const handleEnded = () => {
-      setPlayCount(prev => {
-        const newCount = prev + 1;
-        if (newCount < 2) {
-          // Toca novamente se ainda não tocou 2 vezes
-          audio.currentTime = 0;
-          audio.play().catch(() => {
-            setAudioError(true);
-            setIsPlaying(false);
-          });
-          return newCount;
-        } else {
-          // Para após 2 reproduções
-          setIsPlaying(false);
-          return 0; // Reset do contador
-        }
-      });
+      setIsPlaying(false);
+      setPlayCount(0); // Reset do contador (opcional, pode remover playCount completamente se não usar mais)
     };
 
     audio.addEventListener('play', handlePlay);
@@ -415,11 +401,15 @@ export default function Home() {
   // dayCounter agora é calculado apenas no client para evitar hydration mismatch
   const [dayCounter, setDayCounter] = useState<number | null>(null);
   useEffect(() => {
-    const referenceDate = new Date("June 30, 2025");
+  
+    const startDate = new Date("2025-04-08"); 
     const currentDate = new Date();
-    const timeDiff = currentDate.getTime() - referenceDate.getTime();
-    const dayDiff = Math.floor(timeDiff / (1000 * 3600 * 24));
-    setDayCounter(82 + dayDiff);
+    // Zera horas para evitar problemas de fuso
+    startDate.setHours(0,0,0,0);
+    currentDate.setHours(0,0,0,0);
+    const timeDiff = currentDate.getTime() - startDate.getTime();
+    const dayDiff = Math.floor(timeDiff / (1000 * 3600 * 24)) + 1; // +1 para contar o dia inicial
+    setDayCounter(dayDiff > 0 ? dayDiff : 0);
   }, []);
 
   // Memoize formatted due date string (only on client after mount)
@@ -729,7 +719,7 @@ export default function Home() {
           >
             <div className="absolute inset-0 z-10">
               <Image
-                src="/images/ecografia1.jpg"
+                src="/images/ecografia3.jpg"
                 alt="Ecografia do bebê"
                 fill
                 style={{ objectFit: 'cover' }}
@@ -839,7 +829,7 @@ export default function Home() {
               disableRemotePlayback
               playsInline
             >
-              <source src="/video/eco.mp4" type="video/mp4" />
+              <source src="/video/eco4.mp4" type="video/mp4" />
               Seu navegador não suporta o elemento de vídeo.
             </video>
 
@@ -1011,183 +1001,136 @@ export default function Home() {
 
       {/* Quinta seção - Contagem regressiva */}
       <section className="h-screen w-full flex flex-col items-center justify-center snap-start bg-gradient-to-br from-pink-400 to-sky-400 dark:bg-gradient-to-br dark:from-pink-600 dark:to-sky-600 p-8 relative overflow-hidden">
-        {/* Partículas animadas flutuantes */}
+        {/* Partículas animadas flutuantes - mais suaves */}
         <div className="absolute inset-0 overflow-hidden">
           {Array.from({ length: 15 }).map((_, i) => (
             <motion.div
               key={i}
               className="absolute opacity-20 backdrop-blur-3xl"
               initial={{
-                x: Math.random() * 100 - 50 + "%",
-                y: Math.random() * 100 - 50 + "%",
+                x: `${Math.random() * 100 - 50}%`,
+                y: `${Math.random() * 100 - 50}%`,
                 scale: Math.random() * 0.5 + 0.5,
               }}
               animate={{
                 x: [
-                  Math.random() * 100 - 50 + "%",
-                  Math.random() * 100 - 50 + "%",
-                  Math.random() * 100 - 50 + "%",
+                  `${Math.random() * 100 - 50}%`,
+                  `${Math.random() * 100 - 50}%`,
+                  `${Math.random() * 100 - 50}%`,
                 ],
                 y: [
-                  Math.random() * 100 - 50 + "%",
-                  Math.random() * 100 - 50 + "%",
-                  Math.random() * 100 - 50 + "%",
+                  `${Math.random() * 100 - 50}%`,
+                  `${Math.random() * 100 - 50}%`,
+                  `${Math.random() * 100 - 50}%`,
                 ],
-                opacity: [0.1, 0.2, 0.1],
+                opacity: [0.12, 0.22, 0.12],
               }}
               transition={{
-                duration: 15 + Math.random() * 15,
-                ease: "easeInOut",
+                duration: 28 + Math.random() * 12, // mais lento
+                ease: "linear",
                 repeat: Infinity,
-                repeatType: "reverse",
+                repeatType: "mirror",
               }}
               style={{
-                width: 100 + Math.random() * 100,
-                height: 100 + Math.random() * 100,
+                width: 120 + Math.random() * 80,
+                height: 120 + Math.random() * 80,
                 borderRadius: "50%",
-                background: `radial-gradient(circle, ${i % 2 === 0 ? "rgba(244, 114, 182, 0.15)" : "rgba(125, 211, 252, 0.15)"
-                  } 0%, transparent 70%)`,
+                background: `radial-gradient(circle, ${i % 2 === 0 ? "rgba(244, 114, 182, 0.13)" : "rgba(125, 211, 252, 0.13)"} 0%, transparent 70%)`,
               }}
             />
           ))}
         </div>
 
-        {/* Elementos decorativos temáticos */}
+        {/* Ícones decorativos de calendário, tempo e relógio estilo WhatsApp - animação mais fluida */}
         <motion.div
           className="absolute top-16 right-20 w-12 h-12 opacity-30"
           animate={{
-            y: [0, -10, 0],
-            rotate: [0, 5, 0],
+            y: [0, -16, 0],
+            rotate: [0, 8, 0],
           }}
           transition={{
-            duration: 6,
+            duration: 10,
             ease: "easeInOut",
             repeat: Infinity,
-            repeatType: "reverse",
+            repeatType: "mirror",
+            type: "tween"
           }}
         >
-          {/* Relógio moderno */}
-          <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="12" cy="12" r="10" />
-            <motion.path
-              d="M12 6v6l4 2"
-              animate={{
-                pathLength: [0, 1],
-                opacity: [0.6, 1]
-              }}
-              transition={{
-                duration: 5,
-                repeat: Infinity,
-                repeatType: "reverse",
-                ease: "easeInOut",
-              }}
-            />
+          {/* Relógio estilo WhatsApp */}
+          <svg viewBox="0 0 24 24" fill="#FCE7F3" width="48" height="48">
+            <circle cx="12" cy="12" r="10" fill="#FCE7F3" />
+            <path d="M12 7v5l4 2" stroke="#000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
           </svg>
         </motion.div>
 
         <motion.div
           className="absolute top-24 left-16 w-14 h-14 opacity-20"
           animate={{
-            y: [0, -12, 0],
-            scale: [1, 1.05, 1],
-            rotate: [0, -3, 0],
+            y: [0, -18, 0],
+            scale: [1, 1.09, 1],
+            rotate: [0, -6, 0],
           }}
           transition={{
-            duration: 8,
+            duration: 13,
             ease: "easeInOut",
             repeat: Infinity,
-            repeatType: "reverse",
-            delay: 1,
+            repeatType: "mirror",
+            delay: 1.5,
+            type: "tween"
           }}
         >
-          {/* Calendário estilizado */}
-          <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="3" y="4" width="18" height="18" rx="3" ry="3" />
-            <line x1="16" y1="2" x2="16" y2="6" />
-            <line x1="8" y1="2" x2="8" y2="6" />
-            <motion.line
-              x1="3"
-              y1="10"
-              x2="21"
-              y2="10"
-              animate={{
-                pathLength: [0, 1],
-                opacity: [0.3, 1, 0.3]
-              }}
-              transition={{
-                duration: 4,
-                repeat: Infinity,
-                repeatType: "reverse",
-                ease: "easeInOut",
-              }}
-            />
-            <motion.path
-              d="M9 15h2m2 0h2m-6 3h2m2 0h2"
-              strokeDasharray="0.9 2"
-              animate={{
-                pathLength: [0, 1],
-                opacity: [0.5, 1]
-              }}
-              transition={{
-                duration: 6,
-                repeat: Infinity,
-                repeatType: "reverse",
-                ease: "easeInOut",
-                delay: 2
-              }}
-            />
+          {/* Calendário estilo WhatsApp */}
+          <svg viewBox="0 0 24 24" fill="#FCE7F3" width="56" height="56">
+            <rect x="3" y="4" width="18" height="17" rx="4" fill="#FCE7F3" />
+            <rect x="6" y="8" width="12" height="9" rx="2" fill="#000" />
+            <rect x="8" y="10" width="2" height="2" rx="1" fill="#FCE7F3" />
+            <rect x="14" y="10" width="2" height="2" rx="1" fill="#FCE7F3" />
+            <rect x="8" y="14" width="2" height="2" rx="1" fill="#FCE7F3" />
+            <rect x="14" y="14" width="2" height="2" rx="1" fill="#FCE7F3" />
           </svg>
         </motion.div>
 
         <motion.div
           className="absolute bottom-20 right-24 w-16 h-16 opacity-25"
           animate={{
-            scale: [1, 1.08, 1],
-            rotate: [0, 3, 0],
-            y: [0, -8, 0],
+            scale: [1, 1.13, 1],
+            rotate: [0, 5, 0],
+            y: [0, -14, 0],
           }}
           transition={{
-            duration: 7,
+            duration: 12,
             ease: "easeInOut",
             repeat: Infinity,
-            delay: 2,
+            delay: 2.5,
+            repeatType: "mirror",
+            type: "tween"
           }}
         >
-          {/* Símbolo de bebê */}
-          <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.2">
-            <circle cx="12" cy="6" r="3.5" />
-            <path d="M8 14l-1 8h10l-1-8" />
-            <path d="M8 14c0-2.2 1.8-4 4-4s4 1.8 4 4" />
-            <motion.path
-              d="M6 18h12"
-              animate={{
-                pathLength: [0, 1],
-                opacity: [0.2, 0.8, 0.2]
-              }}
-              transition={{
-                duration: 5,
-                repeat: Infinity,
-                ease: "easeInOut",
-                delay: 1
-              }}
-            />
+          {/* Ampulheta estilo WhatsApp */}
+          <svg viewBox="0 0 24 24" fill="#FCE7F3" width="56" height="56">
+            <rect x="7" y="3" width="10" height="3" rx="1.5" fill="#FCE7F3" />
+            <rect x="7" y="18" width="10" height="3" rx="1.5" fill="#FCE7F3" />
+            <path d="M8 6c0 2.5 2 4.5 4 4.5s4-2 4-4.5" stroke="#FCE7F3" strokeWidth="2" strokeLinecap="round" fill="none" />
+            <path d="M8 18c0-2.5 2-4.5 4-4.5s4 2 4 4.5" stroke="#FCE7F3" strokeWidth="2" strokeLinecap="round" fill="none" />
+            <circle cx="12" cy="12" r="1.5" fill="#FCE7F3" />
           </svg>
         </motion.div>
 
+        {/* Título e countdown - suavização de transições */}
         <motion.h2
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
-          transition={{ duration: 1 }}
-          className="relative z-10 text-5xl font-bold mb-5 bg-clip-text text-transparent bg-gradient-to-r from-white to-pink-100 dark:from-white dark:to-sky-200"
+          transition={{ duration: 1.2, ease: "easeOut" }}
+          className="text-4xl font-bold mb-14 text-white dark:text-white"
         >
-          Estou chegando em
+          Em breve em
         </motion.h2>
 
         {/* Container do countdown principal */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
+          initial={{ opacity: 0, scale: 0.96 }}
           whileInView={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: 1.2, type: "spring", stiffness: 60, damping: 14 }}
           className="relative z-10 w-full max-w-lg"
         >
           {/* Brilho de fundo para o contador */}
@@ -1198,9 +1141,10 @@ export default function Home() {
                 opacity: [0.3, 0.6, 0.3],
               }}
               transition={{
-                duration: 3,
+                duration: 6,
                 repeat: Infinity,
                 ease: "easeInOut",
+                repeatType: "mirror"
               }}
             />
           </div>
@@ -1208,19 +1152,20 @@ export default function Home() {
           <motion.div
             animate={{
               boxShadow: [
-                "0 15px 30px -5px rgba(236, 72, 153, 0.2), 0 8px 10px -6px rgba(14, 165, 233, 0.1)",
-                "0 15px 30px -5px rgba(14, 165, 233, 0.2), 0 8px 10px -6px rgba(236, 72, 153, 0.1)",
-                "0 15px 30px -5px rgba(236, 72, 153, 0.2), 0 8px 10px -6px rgba(14, 165, 233, 0.1)",
+                "0 15px 30px -5px rgba(236, 72, 153, 0.18), 0 8px 10px -6px rgba(14, 165, 233, 0.09)",
+                "0 15px 30px -5px rgba(14, 165, 233, 0.18), 0 8px 10px -6px rgba(236, 72, 153, 0.09)",
+                "0 15px 30px -5px rgba(236, 72, 153, 0.18), 0 8px 10px -6px rgba(14, 165, 233, 0.09)",
               ]
             }}
             transition={{
-              duration: 6,
+              duration: 10,
               repeat: Infinity,
-              ease: "easeInOut"
+              ease: "linear",
+              repeatType: "mirror"
             }}
             className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-8 bg-white/40 dark:bg-gray-900/40 backdrop-blur-xl rounded-2xl shadow-xl border border-white/30 dark:border-sky-500/10"
           >
-            {/* Componentes de contagem animados */}
+            {/* Componentes de contagem animados - mais fluido */}
             {[
               { value: timeLeft.days, label: "Dias", delay: 0 },
               { value: timeLeft.hours, label: "Horas", delay: 0.2 },
@@ -1230,23 +1175,24 @@ export default function Home() {
               <motion.div
                 key={index}
                 whileHover={{
-                  scale: 1.05,
-                  boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
-                  backgroundColor: "rgba(255, 255, 255, 0.95)"
+                  scale: 1.07,
+                  boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.09), 0 10px 10px -5px rgba(0, 0, 0, 0.03)",
+                  backgroundColor: "rgba(255, 255, 255, 0.98)"
                 }}
-                transition={{ type: "spring", stiffness: 400 }}
+                transition={{ type: "spring", stiffness: 80, damping: 12 }}
                 className="flex flex-col items-center p-4 bg-gradient-to-br from-white/80 to-white/60 dark:from-gray-800/90 dark:to-gray-900/80 rounded-xl shadow-lg border border-white/50 dark:border-sky-500/10 backdrop-blur-sm"
               >
                 <div className="relative w-full">
                   <motion.div
                     animate={{
-                      scale: [1, 1.06, 1],
+                      scale: [1, 1.09, 1],
                     }}
                     transition={{
-                      duration: 1.5,
+                      duration: 2.2,
                       delay: item.delay,
                       repeat: Infinity,
-                      ease: "easeInOut"
+                      ease: "easeInOut",
+                      repeatType: "mirror"
                     }}
                     className="relative z-10 text-4xl sm:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-pink-500 to-sky-500 dark:from-pink-400 dark:to-sky-400 text-center"
                   >
@@ -1264,11 +1210,11 @@ export default function Home() {
           </motion.div>
         </motion.div>
 
-        {/* Detalhes de data de nascimento */}
+        {/* Detalhes de data de nascimento - suavização */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.7, duration: 0.8 }}
+          transition={{ delay: 0.7, duration: 1.2, type: "spring", stiffness: 60, damping: 14 }}
           className="relative z-10 mt-8 px-8 py-4 bg-white/30 dark:bg-gray-900/40 backdrop-blur-md rounded-full border border-white/40 dark:border-sky-500/20 shadow-lg"
         >
           {/* Efeito de brilho dinâmico */}
@@ -1278,9 +1224,10 @@ export default function Home() {
               backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
             }}
             transition={{
-              duration: 5,
+              duration: 8,
               repeat: Infinity,
-              ease: "easeInOut",
+              ease: "linear",
+              repeatType: "mirror"
             }}
             style={{
               backgroundSize: "200% 100%",
@@ -1289,14 +1236,14 @@ export default function Home() {
 
           <div className="flex items-center justify-center space-x-2">
             <motion.div
-              animate={{ scale: [1, 1.08, 1] }}
-              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+              animate={{ scale: [1, 1.13, 1] }}
+              transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut", repeatType: "mirror" }}
               className="w-6 h-6 text-lg"
             >
               🗓️
             </motion.div>
             <p className="text-center font-medium bg-clip-text text-transparent bg-gradient-to-r from-pink-600 to-sky-600 dark:from-pink-300 dark:to-sky-300">
-              Vou nascer em: <span className="font-extrabold tracking-wide">{mounted ? formattedDueDate : ''}</span>
+              Chegada prevista: <span className="font-extrabold tracking-wide">{mounted ? formattedDueDate : ''}</span>
             </p>
           </div>
         </motion.div>
